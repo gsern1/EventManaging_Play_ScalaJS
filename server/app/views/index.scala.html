@@ -1,0 +1,9 @@
+@(message: String, isLoggedIn: Boolean, user: User)
+
+@main("Home", isLoggedIn, user) {
+<h2>Hi welcome whatsupp</h2>
+<ul>
+  <li>Play shouts out: <em>@message</em></li>
+  <li>Scala.js shouts out: <em id="scalajsShoutOut"></em></li>
+</ul>
+}

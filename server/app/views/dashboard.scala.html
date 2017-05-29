@@ -1,0 +1,95 @@
+@(isLoggedIn: Boolean, user: User, error: String = "")
+
+@main("Dashboard", isLoggedIn, user) {
+  <div class="row">
+    <div class="col-md-6">
+      <h2>Coming events</h2>
+      <ul class="list-group">
+        <li class="list-group-item">
+          <div class="col-xs-12 col-sm-3">
+            <img src="http://yeah.paleo.ch/sites/default/files/wysiwyg_upload/images/2017/affiche_paleo_2017-1400.jpg" alt="Scott Stevens" class="img-responsive" />
+          </div>
+          <div class="col-xs-12 col-sm-9">
+            <span class="name"><a href="#">Paleo</a></span><br/>
+            <span class="description">Festival in Nyon</span><br/>
+            <span class="date">16.06.2017 14:00</span>
+          </div>
+          <div class="clearfix"></div>
+        </li>
+        <li class="list-group-item">
+          <div class="col-xs-12 col-sm-3">
+            <img src="http://www.events-gallery.ch/Images/Photos/Events/Clubbing/2013/20130503_051_19095/flyer_front_19095.png" alt="Seth Frazier" class="img-responsive" />
+          </div>
+          <div class="col-xs-12 col-sm-9">
+            <span class="name"><a href="#">Balelec</a></span><br/>
+            <span class="description">Festival in Ecublens</span><br/>
+            <span class="date">16.06.2017 14:00</span>
+          </div>
+          <div class="clearfix"></div>
+        </li>
+        <li class="list-group-item">
+          <div class="col-xs-12 col-sm-3">
+            <img src="http://api.randomuser.me/portraits/women/90.jpg" alt="Jean Myers" class="img-responsive img-circle" />
+          </div>
+          <div class="col-xs-12 col-sm-9">
+            <span class="name"><a href="#">Chubli</a></span><br/>
+            <span class="description">Birthday party at Jean's house</span><br/>
+            <span class="date">11.09.2017 14:00</span>
+          </div>
+          <div class="clearfix"></div>
+        </li>
+        <li class="list-group-item">
+          <div class="col-xs-12 col-sm-3">
+            <img src="http://api.randomuser.me/portraits/men/24.jpg" alt="Todd Shelton" class="img-responsive img-circle" />
+          </div>
+          <div class="col-xs-12 col-sm-9">
+            <span class="name"><a href="#">Moe's birthday</a></span><br/>
+            <span class="description">Birthday party at Moe's house</span><br/>
+            <span class="date">01.02.2017 3:00</span>
+          </div>
+          <div class="clearfix"></div>
+        </li>
+        <li class="list-group-item">
+          <div class="col-xs-12 col-sm-3">
+            <img src="http://api.randomuser.me/portraits/women/34.jpg" alt="Rosemary Porter" class="img-responsive img-circle" />
+          </div>
+          <div class="col-xs-12 col-sm-9">
+            <span class="name"><a href="#">Chubli</a></span><br/>
+            <span class="description">Birthday party at Jean's house</span><br/>
+            <span class="date">11.09.2017 14:00</span>
+          </div>
+          <div class="clearfix"></div>
+        </li>
+        <li class="list-group-item">
+          <div class="col-xs-12 col-sm-3">
+            <img src="http://api.randomuser.me/portraits/women/56.jpg" alt="Debbie Schmidt" class="img-responsive img-circle" />
+          </div>
+          <div class="col-xs-12 col-sm-9">
+            <span class="name"><a href="#">Chubli</a></span><br/>
+            <span class="description">Birthday party at Jean's house</span><br/>
+            <span class="date">11.09.2017 14:00</span>
+          </div>
+          <div class="clearfix"></div>
+        </li>
+        <li class="list-group-item">
+          <div class="col-xs-12 col-sm-3">
+            <img src="http://api.randomuser.me/portraits/women/76.jpg" alt="Glenda Patterson" class="img-responsive img-circle" />
+          </div>
+          <div class="col-xs-12 col-sm-9">
+            <span class="name"><a href="#">Chubli</a></span><br/>
+            <span class="description">Birthday party at Jean's house</span><br/>
+            <span class="date">11.09.2017 14:00</span>
+          </div>
+          <div class="clearfix"></div>
+        </li>
+      </ul>
+    </div>
+    <div class="col-md-6">
+      <!--<div id="map-canvas"></div>
+      <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC21yXALCMFSiYnYFrLbq2orXwEiH7-y20"></script>
+      <script language="JavaScript">
+              GoogleMaps().main()
+      </script>-->
+    </div>
+  </div>
+}

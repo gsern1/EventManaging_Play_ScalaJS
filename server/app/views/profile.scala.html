@@ -1,0 +1,10 @@
+@(isLoggedIn: Boolean, user: User)
+
+  @main("Profile", isLoggedIn, user) {
+    <div class="row">
+      <div class="col-md-12">
+        <h2>My profile</h2>
+        <p>Username: @user.username</p>
+      </div>
+    </div>
+  }
