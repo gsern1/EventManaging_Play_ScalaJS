@@ -11,6 +11,7 @@ object UserDB {
 
     var users : Map[String, User] = new HashMap[String, User]()
 
+
     /**
      * Adds the specified user to the UserInfoDB.
      * @param username Their username.
@@ -18,6 +19,7 @@ object UserDB {
      */
     def addUser(username: String, password: String) {
         users.put(username, new User(username, password));
+
     }
 
     /**
