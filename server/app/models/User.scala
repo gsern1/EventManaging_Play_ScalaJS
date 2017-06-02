@@ -50,11 +50,11 @@ class UserRepo @Inject()(eventRepo: EventRepo)(protected val dbConfigProvider: D
     def findById(id: Long): Future[Option[User]] =
         db.run(_findById(id))
 
-    def findByName(username: String): Future[List[User]] =
-        db.run(_findByName(username).result)
+    def findByName(username: String): Future[Option[User]] =
+        db.run(_findByName(username).result).map(_.headOption)
 
     def userExists(username:String): Future[Boolean]=
-        findByName(username).map(_.headOption).map(_.isDefined)
+        findByName(username).map(_.isDefined)
 
     def allUsers: Future[List[User]] =
         db.run(Users.to[List].result)
