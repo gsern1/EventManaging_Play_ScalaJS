@@ -11,10 +11,13 @@ lazy val server = (project in file("server")).settings(
   compile in Compile := ((compile in Compile) dependsOn scalaJSPipeline).value,
   libraryDependencies ++= Seq(
     "com.vmunier" %% "scalajs-scripts" % "latest.release",
-    specs2 % Test,
     "org.webjars" % "bootstrap" % "3.3.5",
     "org.webjars" % "font-awesome" % "4.3.0-2",
-    "com.typesafe.slick" %% "slick" % "3.0.0"
+    "com.typesafe.play" %% "play-slick" % "2.0.2",
+    "com.typesafe.play" %% "play-slick-evolutions" % "2.0.2",
+    "com.h2database" % "h2" % "1.4.192",
+    "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % "test",
+    specs2 % Test
   ) ,
   EclipseKeys.preTasks := Seq(compile in Compile)
 ).enablePlugins(PlayScala).
