@@ -62,7 +62,7 @@ class Application @Inject()(userRepo: UserRepo, eventRepo: EventRepo, secured: S
 	}
 
 	def logout = Action { request =>
-		Redirect(routes.Application.login()).withSession("username" -> "")
+		Redirect(routes.Application.login()).withNewSession
 	}
 
 	def profile = Action { request =>

@@ -64,8 +64,8 @@ class UserRepo @Inject()(eventRepo: EventRepo)(protected val dbConfigProvider: D
         db.run(Users returning Users.map(_.id) += user)
     }
 
-    def authenticate(username: String, password: String)(implicit ec: ExecutionContext): Future[Boolean] = {
-        findByName(username).filter( user => password == user.head.password).map(_.headOption).map(_.isDefined)
+    def authenticate(username: String, password: String): Future[Boolean] = {
+        findByName(username).filter( user => user.orNull != null && password.equals(user.orNull.password)).map(_.isDefined)
     }
 
     def delete(name:String): Future[Int] = {
@@ -80,11 +80,11 @@ class UserRepo @Inject()(eventRepo: EventRepo)(protected val dbConfigProvider: D
         db.run(interaction.transactionally)
     }
 
-    private [models] class UsersTable(tag:Tag) extends Table[User](tag, "USERS"){
+    private [models] class UsersTable(tag:Tag) extends Table[User](tag, "users"){
 
-        def id = column[Long]("USR_ID", O.PrimaryKey, O.AutoInc) // This is the primary key column
-        def username = column[String]("USR_NAME")
-        def password = column[String]("USR_PW")
+        def id = column[Long]("id", O.PrimaryKey, O.AutoInc) // This is the primary key column
+        def username = column[String]("username")
+        def password = column[String]("password")
 
         // Every table needs a * projection with the same type as the table's type parameter
         def * = (id, username, password) <> (User.tupled, User.unapply)

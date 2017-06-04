@@ -17,7 +17,7 @@ lazy val server = (project in file("server")).settings(
     "com.typesafe.play" %% "play-slick-evolutions" % "2.0.2",
     "com.h2database" % "h2" % "1.4.192",
     "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % "test",
-    specs2 % Test
+    "mysql" % "mysql-connector-java" % "5.1.34"
   ) ,
   EclipseKeys.preTasks := Seq(compile in Compile)
 ).enablePlugins(PlayScala).

@@ -15,10 +15,10 @@ import scala.concurrent.Future
 
 
 
-case class Event(id: Long, color: String, description: String, creator: Long) {
+case class Event(id: Long, name: String, description: String, creator: Long) {
 
-	def patch(color: Option[String], description: Option[String], creator: Option[Long]): Event =
-		this.copy(color = color.getOrElse(this.color),
+	def patch(name: Option[String], description: Option[String], creator: Option[Long]): Event =
+		this.copy(name = name.getOrElse(this.name),
 			description = description.getOrElse(this.description),
 			creator = creator.getOrElse(this.creator))
 }
@@ -30,7 +30,7 @@ class EventRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
 	val db = dbConfig.db
 	import dbConfig.driver.api._
 
-	private[models] val Events = TableQuery[TasksTable]
+	private[models] val Events = TableQuery[EventsTable]
 
 
 	def findById(id: Long): Future[Event] =
@@ -61,15 +61,15 @@ class EventRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
 		Events returning Events.map(_.id) += event
 
 
-	private[models] class TasksTable(tag: Tag) extends Table[Event](tag, "TASK") {
+	private[models] class EventsTable(tag: Tag) extends Table[Event](tag, "events") {
 
-		def id = column[Long]("ID", O.AutoInc, O.PrimaryKey)
-		def color = column[String]("COLOR")
-		def description = column[String]("DESCRIPTION")
-		def creator = column[Long]("CREATOR")
+		def id = column[Long]("id", O.AutoInc, O.PrimaryKey)
+		def name = column[String]("name")
+		def description = column[String]("description")
+		def creator = column[Long]("creator")
 
-		def * = (id, color, description, creator) <> (Event.tupled, Event.unapply)
-		def ? = (id.?, color.?, description.?, creator.?).shaped.<>({ r => import r._; _1.map(_ => Event.tupled((_1.get, _2.get, _3.get, _4.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
+		def * = (id, name, description, creator) <> (Event.tupled, Event.unapply)
+		def ? = (id.?, name.?, description.?, creator.?).shaped.<>({ r => import r._; _1.map(_ => Event.tupled((_1.get, _2.get, _3.get, _4.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
 	}
 
 
