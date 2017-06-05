@@ -13,11 +13,13 @@ lazy val server = (project in file("server")).settings(
     "com.vmunier" %% "scalajs-scripts" % "latest.release",
     "org.webjars" % "bootstrap" % "3.3.5",
     "org.webjars" % "font-awesome" % "4.3.0-2",
+    "org.webjars" % "bootstrap-datepicker" % "1.6.1",
     "com.typesafe.play" %% "play-slick" % "2.0.2",
     "com.typesafe.play" %% "play-slick-evolutions" % "2.0.2",
     "com.h2database" % "h2" % "1.4.192",
     "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % "test",
     "mysql" % "mysql-connector-java" % "5.1.34"
+
   ) ,
   EclipseKeys.preTasks := Seq(compile in Compile)
 ).enablePlugins(PlayScala).

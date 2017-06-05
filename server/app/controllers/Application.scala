@@ -1,5 +1,8 @@
 package controllers
 
+import java.text.{DateFormat, SimpleDateFormat}
+import java.util.Date
+
 import models.{EventRepo, User, UserRepo}
 import play.api.data.Form
 import play.api.mvc._
@@ -7,11 +10,12 @@ import play.mvc.Controller.{request, _}
 import shared.SharedMessages
 import play.api.mvc.Results._
 import javax.inject.Inject
+import javax.swing.text.DateFormatter
 
 import play.api.Play
 import slick.driver.JdbcProfile
 
-import scala.concurrent.Await
+import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
 
 
@@ -71,6 +75,32 @@ class Application @Inject()(userRepo: UserRepo, eventRepo: EventRepo, secured: S
 		} else {
 			Ok(views.html.profile(secured.isLoggedIn(request), Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull))
 		}
+	}
+
+	def createEvent = Action { request =>
+
+		val name = request.body.asFormUrlEncoded.get("name").head
+		val date = request.body.asFormUrlEncoded.get("date").head
+		val description = request.body.asFormUrlEncoded.get("description").head
+		val creatorName = request.session.get("username").orNull
+
+		//Parse Date
+		//var formatter: DateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+		//val date = formatter.parse(dateString)
+
+		//var dt = new java.util.Date()
+		//val sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+
+		//val creator = Await.result(userRepo.findByName(creatorName), Duration(10, "seconds")).head.id;
+
+		val creator = Await.result(userRepo.findByName(creatorName), Duration(10, "seconds")).head.id;
+
+
+		if(Await.result(eventRepo.createEvent(name,date,description,creator), Duration(10, "seconds")) != null)
+			Redirect(routes.Application.dashboard())
+		else
+			Redirect(routes.Application.dashboard())
+
 	}
 }
 
