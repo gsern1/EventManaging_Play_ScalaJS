@@ -27,7 +27,7 @@ class Secured @Inject()(userRepo: UserRepo) {
       * @param ctx The context.
       * @return The username.
       */
-    def getUsername(request: Request[Any]) = request.session.get("username").orNull
+        def getUsername(request: Request[Any]) = request.session.get("username").orNull
 
     /**
       * True if there is a logged in user, false otherwise.

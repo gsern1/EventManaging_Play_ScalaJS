@@ -3,7 +3,7 @@ package controllers
 import java.text.{DateFormat, SimpleDateFormat}
 import java.util.Date
 
-import models.{EventRepo, User, UserRepo}
+import models.{Event, EventRepo, User, UserRepo}
 import play.api.data.Form
 import play.api.mvc._
 import play.mvc.Controller.{request, _}
@@ -74,6 +74,15 @@ class Application @Inject()(userRepo: UserRepo, eventRepo: EventRepo, secured: S
 			Redirect(routes.Application.login())
 		} else {
 			Ok(views.html.profile(secured.isLoggedIn(request), Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull))
+		}
+	}
+
+	def event(id: Long) = Action { request =>
+		if (!secured.isLoggedIn(request)) {
+			Redirect(routes.Application.login())
+		} else {
+			val event = Event(0, "Paleo festival", "01.01.01", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eget turpis tincidunt, cursus dolor quis, luctus ipsum. Cras vulputate pellentesque lacus. Nullam pellentesque luctus felis id ultrices. In pharetra est a ipsum cursus, quis luctus tortor ultricies. Curabitur consectetur gravida tellus, quis tincidunt risus. Nunc egestas imperdiet magna in laoreet. Etiam condimentum iaculis euismod. Suspendisse iaculis, turpis non molestie lobortis, quam nibh semper metus, vel luctus magna massa eget urna. Nullam faucibus euismod diam id cursus. In sed risus nec arcu scelerisque posuere. Donec vel elit sed odio cursus suscipit. Donec pretium arcu eu placerat scelerisque. Ut sit amet urna tempus, congue quam pharetra, cursus purus.\n\nDonec condimentum pellentesque justo, non eleifend sem tincidunt quis. Proin justo nunc, blandit quis congue et, venenatis ac magna. Sed quis maximus ipsum, non blandit lectus. Ut non erat non velit vestibulum sagittis sed at urna. Etiam tellus eros, tristique quis tortor ut, rutrum viverra dolor. Praesent bibendum nec tellus sed consequat. Cras ac metus dui. Mauris placerat sem nec tempus vulputate. Donec sit amet molestie diam, ut luctus libero.\n\nNulla consectetur felis id ultrices ultricies. Fusce ornare tempor orci quis gravida. Praesent mollis, enim eget varius rhoncus, diam mi tristique sem, sit amet congue arcu risus ac nisi. Nulla iaculis, risus non posuere elementum, eros quam sagittis purus, fermentum gravida neque nulla sed urna. Suspendisse accumsan aliquet lorem ac ultrices. Maecenas maximus eleifend rhoncus. Ut ultricies, neque sit amet sodales imperdiet, lorem nulla lobortis tortor, sed imperdiet enim purus et justo. Integer sed posuere odio, id feugiat metus. Nam lectus mauris, auctor ac facilisis eget, porta nec orci. Quisque in justo varius, vestibulum velit eget, ultrices ante. Ut consectetur tincidunt varius. Praesent bibendum nisi id mauris vulputate, nec pulvinar ante tincidunt. Quisque venenatis, lorem a eleifend faucibus, dolor ipsum tempus leo, in dapibus magna nunc quis ex.", 1)
+			Ok(views.html.event(secured.isLoggedIn(request), Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull, event))
 		}
 	}
 
