@@ -5,21 +5,26 @@ package models
   */
 
 
-import java.util.Date
+import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatter._
+import java.sql.Date
 import javax.inject.Inject
 
 import com.sun.org.glassfish.gmbal.Description
+import org.joda.time.format.DateTimeFormat
 import play.api.db.slick.DatabaseConfigProvider
 import slick.driver.JdbcProfile
+import java.sql.Timestamp
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
 
 
-case class Event(id: Long, name: String, date: String, description: String, creator: Long) {
+case class Event(id: Long, name: String, date: java.sql.Timestamp, description: String, creator: Long) {
 
-	def patch(name: Option[String], date: Option[String],  description: Option[String], creator: Option[Long]): Event =
+	def patch(name: Option[String], date: Option[Timestamp],  description: Option[String], creator: Option[Long]): Event =
 		this.copy(name = name.getOrElse(this.name),
 			date = date.getOrElse(this.date),
 			description = description.getOrElse(this.description),
@@ -45,7 +50,7 @@ class EventRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
 
 
 
-	def partialUpdate(id: Long, name: Option[String], date: Option[String], description: Option[String], creator: Option[Long]): Future[Int] = {
+	def partialUpdate(id: Long, name: Option[String], date: Option[Timestamp], description: Option[String], creator: Option[Long]): Future[Int] = {
 		import scala.concurrent.ExecutionContext.Implicits.global
 
 		val query = Events.filter(_.id === id)
@@ -60,9 +65,12 @@ class EventRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
 	def all(): DBIO[Seq[Event]] =
 		Events.result
 
-	def createEvent(name: String, date: String, description: String, creator: Long): Future[Long] = {
+	def createEvent(name: String, date: Timestamp, description: String, creator: Long): Future[Long] = {
 
 		//val creator = Await.result(userRepo.findByName(creatorName), Duration(10, "seconds")).head.id;
+
+		//val format : DateTimeFormatter = DateTimeFormat.forPattern("YYYY-MM-DD HH:MM")
+		//val datetime : Date = format(date)
 
 		val event = Event(0,name,date,description,creator)
 		db.run(Events returning Events.map(_.id) += event)
@@ -70,18 +78,8 @@ class EventRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
 	}
 
 
-/*
-	object DateMapper {
 
-		val utilDate2SqlTimestampMapper = MappedColumnType.base[java.util.Date, java.sql.Timestamp](
-			{ utilDate => new java.sql.Timestamp(utilDate.getTime()) },
-			{ sqlTimestamp => new java.util.Date(sqlTimestamp.getTime()) })
 
-		val utilDate2SqlDate = MappedColumnType.base[java.util.Date, java.sql.Date](
-			{ utilDate => new java.sql.Date(utilDate.getTime()) },
-			{ sqlDate => new java.util.Date(sqlDate.getTime()) })
-
-	}*/
 
 	private[models] class EventsTable(tag: Tag) extends Table[Event](tag, "events") {
 
@@ -89,7 +87,7 @@ class EventRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
 
 		def id = column[Long]("id", O.AutoInc, O.PrimaryKey)
 		def name = column[String]("name")
-		def date = column[String]("date")//(DateMapper.utilDate2SqlDate.optionType)
+		def date = column[java.sql.Timestamp]("date")
 		def description = column[String]("description")
 		def creator = column[Long]("creator")
 

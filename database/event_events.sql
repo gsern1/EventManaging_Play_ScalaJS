@@ -25,7 +25,7 @@ DROP TABLE IF EXISTS `events`;
 CREATE TABLE `events` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(45) NOT NULL,
-  `date` varchar(45) NOT NULL,
+  `date` DATETIME NOT NULL,
   `description` varchar(45) DEFAULT NULL,
   `creator` int(11) NOT NULL,
   PRIMARY KEY (`id`),
