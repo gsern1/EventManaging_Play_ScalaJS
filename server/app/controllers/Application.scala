@@ -1,5 +1,6 @@
 package controllers
 
+import java.sql.Timestamp
 import java.text.{DateFormat, SimpleDateFormat}
 import java.util.Date
 
@@ -89,19 +90,20 @@ class Application @Inject()(userRepo: UserRepo, eventRepo: EventRepo, secured: S
 	def createEvent = Action { request =>
 
 		val name = request.body.asFormUrlEncoded.get("name").head
-		val date = request.body.asFormUrlEncoded.get("date").head
+		val dateString = request.body.asFormUrlEncoded.get("date").head
 		val description = request.body.asFormUrlEncoded.get("description").head
 		val creatorName = request.session.get("username").orNull
 
 		//Parse Date
 		//var formatter: DateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-		//val date = formatter.parse(dateString)
+		//val date:Date = formatter.parse(dateString)
 
 		//var dt = new java.util.Date()
 		//val sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
 		//val creator = Await.result(userRepo.findByName(creatorName), Duration(10, "seconds")).head.id;
 
+		val date : Timestamp= Timestamp.valueOf(dateString)
 		val creator = Await.result(userRepo.findByName(creatorName), Duration(10, "seconds")).head.id;
 
 
