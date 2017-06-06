@@ -1,0 +1,33 @@
+@(isLoggedIn: Boolean, user: User, event: Event)
+
+@main("Dashboard", isLoggedIn, user) {
+    <form>
+        <div class="row">
+            <div class="col-md-12">
+                <h2>Name</h2>
+                <input type="text" class="form-control" placeholder="Enter the name..." value="@event.name"/><br/>
+                <i>Created by @event.creator</i>
+                <hr/>
+                <div class="row">
+                    <div class="col-md-6">
+                        <img src="http://www.events-gallery.ch/Images/Photos/Events/Clubbing/2013/20130503_051_19095/flyer_front_19095.png" alt="Seth Frazier" class="img-responsive" /><br/>
+                        <input type="file" class="form-control"/>
+                    </div>
+                    <div class="col-md-6">
+                        <h2>
+                            Description
+                        </h2>
+                        <textarea class="form-control" placeholder="Enter the description..." rows="20">@event.description</textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <h2>Location</h2>
+                        <input type="text" class="form-control" placeholder="Enter the location..."/><br/>
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d2965.0824050173574!2d-93.63905729999999!3d41.998507000000004!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1sWebFilings%2C+University+Boulevard%2C+Ames%2C+IA!5e0!3m2!1sen!2sus!4v1390839289319" width="100%" height="350" frameborder="0" style="border:0"></iframe>
+                    </div>
+                </div>
+                <hr/>
+                <button class="btn btn-primary pull-right">Save</button><br/><br/><br/><br/>
+            </div>
+        </div>
+    </form>
+}

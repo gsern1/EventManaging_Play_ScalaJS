@@ -1,9 +1,36 @@
-@(message: String, isLoggedIn: Boolean, user: User)
+@(isLoggedIn: Boolean, user: User)
 
 @main("Home", isLoggedIn, user) {
-<h2>Hi welcome whatsupp</h2>
-<ul>
-  <li>Play shouts out: <em>@message</em></li>
-  <li>Scala.js shouts out: <em id="scalajsShoutOut"></em></li>
-</ul>
+  <div class="row">
+    <div class="navbar-second col-md-12">
+      <div class="row">
+        <div class="col-md-6 col-md-offset-3 text-center">
+          <h2>Welcome on Events</h2>
+          <h4>We hope you'll have fun</h4><br/>
+          <a class="btn navbar-button center-block" href="https://github.com/gsern1/EventManaging_Play_ScalaJS">Github</a>
+          <a class="btn navbar-button center-block" href="https://github.com/gsern1/EventManaging_Play_ScalaJS">Docs</a>
+          <br/><br/>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="info">
+      <h2>You can create events</h2>
+      <img src="http://www.events-gallery.ch/Images/Photos/Events/Clubbing/2013/20130503_051_19095/flyer_front_19095.png" alt="Seth Frazier" />
+      <img src="https://s-media-cache-ak0.pinimg.com/originals/b3/42/d0/b342d0ac079e36f83ee475ec31f7ea66.jpg" alt="Seth Frazier" class="img-responsive" />
+      <img src="https://s-media-cache-ak0.pinimg.com/736x/b8/e4/c6/b8e4c672a2c284c2c213fdcb83830b52.jpg" alt="Seth Frazier" class="img-responsive" />
+    </div>
+    <div class="info">
+      <h2>And organise them with your friends</h2>
+      <i class="glyphicon glyphicon-th-list"></i>
+    </div>
+    <hr/>
+    <div class="copyrights">
+      <p>Events © 2016, All Rights Reserved
+        <br>
+        <span>Created by: Antoine Drabble & Guillaume Serneels</span></p>
+      <p>Open source on <a href="https://github.com/gsern1/EventManaging_Play_ScalaJS">GitHub</a></p>
+    </div>
+  </div>
 }

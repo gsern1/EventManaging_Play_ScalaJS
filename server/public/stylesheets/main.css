@@ -1,9 +1,68 @@
 body {
-    padding-top: 70px;  /* Move body of page below navbar. */
+    padding-top: 50px;  /* Move body of page below navbar. */
+}
+.container{
+    width: 100%;
+}
+
+/* HEADER */
+.navbar-inverse .navbar-brand {
+    color: #fff;
 }
 .navbar-inverse .navbar-nav > li > .active{
     color: #fff;
 }
+.navbar{
+    background-color: #031d45;
+}
+
+
+/* HOME PAGE */
+.navbar-second{
+    background-color: #032874;
+    padding: 30px;
+}
+.navbar-second h2{
+    color: #fff;
+}
+.navbar-second h4{
+    color: #dfdfdf;
+}
+.navbar-button{
+    background-color: #0348ed;
+    color: white;
+    display: inline-block;
+}
+.navbar-button:hover{
+    color: #eaeaea;
+}
+.navbar-button:focus{
+     color: #eaeaea;
+ }
+a .navbar-logo{
+    margin-top: -10px;
+    height: 40px;
+    display: inline-block;
+}
+.info{
+    text-align:center;
+}
+.info img{
+    max-width: 200px;
+    margin: 30px;
+    display: inline-block;
+}
+.info i{
+    margin: 10px;
+    color: #0348ed;
+    font-size: 150px;
+    display: inline-block;
+}
+.copyrights{
+    text-align: center;
+}
+
+/* MESSAGES */
 .name{
     font-weight: bold;
     font-size: 16px;

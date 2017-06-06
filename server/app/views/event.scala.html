@@ -3,10 +3,10 @@
 @main("Dashboard", isLoggedIn, user) {
     <div class="row">
         <div class="col-md-12">
-            <button class="btn btn-primary pull-right">Participate</button>
-            <button class="btn btn-danger pull-right">Don't participate</button>
-            <button class="btn btn-warning pull-right">Edit event</button>
-            <h2>Event @event.name</h2>
+            <button class="btn btn-primary pull-right" style="margin: 5px; margin-top: 20px;">Participate</button>
+            <button class="btn btn-danger pull-right" style="margin: 5px; margin-top: 20px;">Don't participate</button>
+            <a href="/event/@event.id/edit" class="btn btn-warning pull-right" style="margin: 5px; margin-top: 20px;">Edit event</a>
+            <h2>@event.name</h2>
             <i>Created by @event.creator</i>
             <hr/>
             <div class="row">
