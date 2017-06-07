@@ -5,34 +5,30 @@ package models
   */
 
 
-import java.text.SimpleDateFormat
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeFormatter._
-import java.sql.Date
+
 import javax.inject.Inject
 
-import com.sun.org.glassfish.gmbal.Description
-import org.joda.time.format.DateTimeFormat
 import play.api.db.slick.DatabaseConfigProvider
 import slick.driver.JdbcProfile
 import java.sql.Timestamp
 
-import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
 
 
-case class Event(id: Long, name: String, date: java.sql.Timestamp, description: String, creator: Long) {
+case class Event(id: Long, name: String, date: Timestamp, location:String, description: String, creator: Long, picture : Long) {
 
-	def patch(name: Option[String], date: Option[Timestamp],  description: Option[String], creator: Option[Long]): Event =
+	def patch(name: Option[String], date: Option[Timestamp],  location: Option[String],  description: Option[String], creator: Option[Long], picture : Option[Long] ): Event =
 		this.copy(name = name.getOrElse(this.name),
 			date = date.getOrElse(this.date),
+			location = location.getOrElse(this.location),
 			description = description.getOrElse(this.description),
-			creator = creator.getOrElse(this.creator))
+			creator = creator.getOrElse(this.creator),
+			picture = picture.getOrElse(this.picture))
 }
 
 
-class EventRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) {
+class EventRepo @Inject()(pictureRepo: PictureRepo)(protected val dbConfigProvider: DatabaseConfigProvider) {
 
 	val dbConfig = dbConfigProvider.get[JdbcProfile]
 	val db = dbConfig.db
@@ -50,13 +46,13 @@ class EventRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
 
 
 
-	def partialUpdate(id: Long, name: Option[String], date: Option[Timestamp], description: Option[String], creator: Option[Long]): Future[Int] = {
+	def partialUpdate(id: Long, name: Option[String], date: Option[Timestamp], location: Option[String],description: Option[String], creator: Option[Long], picture:Option[Long]): Future[Int] = {
 		import scala.concurrent.ExecutionContext.Implicits.global
 
 		val query = Events.filter(_.id === id)
 
 		val update = query.result.head.flatMap {event =>
-			query.update(event.patch(name, date, description, creator))
+			query.update(event.patch(name, date, location, description, creator, picture))
 		}
 
 		db.run(update)
@@ -65,14 +61,14 @@ class EventRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
 	def all(): DBIO[Seq[Event]] =
 		Events.result
 
-	def createEvent(name: String, date: Timestamp, description: String, creator: Long): Future[Long] = {
+	def createEvent(name: String, date: Timestamp, location:String, description: String, creator: Long, picture: Long): Future[Long] = {
 
 		//val creator = Await.result(userRepo.findByName(creatorName), Duration(10, "seconds")).head.id;
 
 		//val format : DateTimeFormatter = DateTimeFormat.forPattern("YYYY-MM-DD HH:MM")
 		//val datetime : Date = format(date)
 
-		val event = Event(0,name,date,description,creator)
+		val event = Event(0,name,date,location,description,creator,picture)
 		db.run(Events returning Events.map(_.id) += event)
 
 	}
@@ -88,11 +84,13 @@ class EventRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
 		def id = column[Long]("id", O.AutoInc, O.PrimaryKey)
 		def name = column[String]("name")
 		def date = column[java.sql.Timestamp]("date")
+		def location = column[String]("location")
 		def description = column[String]("description")
 		def creator = column[Long]("creator")
+		def picture = column[Long]("picture")
 
-		def * = (id, name, date, description, creator) <> (Event.tupled, Event.unapply)
-		def ? = (id.?, name.?, date.?, description.?, creator.?).shaped.<>({ r => import r._; _1.map(_ => Event.tupled((_1.get, _2.get, _3.get, _4.get, _5.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
+		def * = (id, name, date, location, description, creator, picture) <> (Event.tupled, Event.unapply)
+		def ? = (id.?, name.?, date.?, location.?, description.?, creator.?, picture.?).shaped.<>({ r => import r._; _1.map(_ => Event.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get, _7.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
 	}
 
 
