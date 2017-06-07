@@ -33,8 +33,11 @@ class Application @Inject()(userRepo: UserRepo, eventRepo: EventRepo, pictureRep
 	def dashboard = Action { request =>
 		if (!secured.isLoggedIn(request))
 			Redirect(routes.Application.login())
-		else
-			Ok(views.html.dashboard(secured.isLoggedIn(request), Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull))
+		else {
+			val events = Await.result(eventRepo.findAll(), Duration(10, "seconds"))
+			val pictures = events.map(p => Await.result(pictureRepo.findById(p.picture), Duration(10, "seconds")))
+			Ok(views.html.dashboard(secured.isLoggedIn(request), Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull, events, pictures))
+		}
 	}
 
 	def register = Action { request =>
@@ -86,9 +89,9 @@ class Application @Inject()(userRepo: UserRepo, eventRepo: EventRepo, pictureRep
 		if (!secured.isLoggedIn(request)) {
 			Redirect(routes.Application.login())
 		} else {
-			val event = Event(0, "Paleo festival", Timestamp.valueOf("2018-12-20 08:30:45"),"Chemin du levant 71, 1003 Lausanne", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eget turpis tincidunt, cursus dolor quis, luctus ipsum. Cras vulputate pellentesque lacus. Nullam pellentesque luctus felis id ultrices. In pharetra est a ipsum cursus, quis luctus tortor ultricies. Curabitur consectetur gravida tellus, quis tincidunt risus. Nunc egestas imperdiet magna in laoreet. Etiam condimentum iaculis euismod. Suspendisse iaculis, turpis non molestie lobortis, quam nibh semper metus, vel luctus magna massa eget urna. Nullam faucibus euismod diam id cursus. In sed risus nec arcu scelerisque posuere. Donec vel elit sed odio cursus suscipit. Donec pretium arcu eu placerat scelerisque. Ut sit amet urna tempus, congue quam pharetra, cursus purus.\n\nDonec condimentum pellentesque justo, non eleifend sem tincidunt quis. Proin justo nunc, blandit quis congue et, venenatis ac magna. Sed quis maximus ipsum, non blandit lectus. Ut non erat non velit vestibulum sagittis sed at urna. Etiam tellus eros, tristique quis tortor ut, rutrum viverra dolor. Praesent bibendum nec tellus sed consequat. Cras ac metus dui. Mauris placerat sem nec tempus vulputate. Donec sit amet molestie diam, ut luctus libero.\n\nNulla consectetur felis id ultrices ultricies. Fusce ornare tempor orci quis gravida. Praesent mollis, enim eget varius rhoncus, diam mi tristique sem, sit amet congue arcu risus ac nisi. Nulla iaculis, risus non posuere elementum, eros quam sagittis purus, fermentum gravida neque nulla sed urna. Suspendisse accumsan aliquet lorem ac ultrices. Maecenas maximus eleifend rhoncus. Ut ultricies, neque sit amet sodales imperdiet, lorem nulla lobortis tortor, sed imperdiet enim purus et justo. Integer sed posuere odio, id feugiat metus. Nam lectus mauris, auctor ac facilisis eget, porta nec orci. Quisque in justo varius, vestibulum velit eget, ultrices ante. Ut consectetur tincidunt varius. Praesent bibendum nisi id mauris vulputate, nec pulvinar ante tincidunt. Quisque venenatis, lorem a eleifend faucibus, dolor ipsum tempus leo, in dapibus magna nunc quis ex.",2, 1)
-
-			Ok(views.html.event(secured.isLoggedIn(request), Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull, event))
+			val event = Await.result(eventRepo.findById(id), Duration(10, "seconds"))
+			val picture = Await.result(pictureRepo.findById(event.picture), Duration(10, "seconds"))
+			Ok(views.html.event(secured.isLoggedIn(request), Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull, event, picture))
 		}
 	}
 
@@ -96,44 +99,38 @@ class Application @Inject()(userRepo: UserRepo, eventRepo: EventRepo, pictureRep
 
 		request.body.file("picture").map { picture =>
 			import java.io.File
-			val filename = picture.filename
-			val contentType = picture.contentType
-			picture.ref.moveTo(new File(s"/public/images/events/$filename"))
+			//val filename = java.util.UUID.randomUUID.toString + "." + picture.filename.split(".").last
+			var filename = picture.filename
+			picture.ref.moveTo(new File("D:\\Cours HEIG 2016-2017 S2\\Scala\\EventManaging_Play_ScalaJS\\server\\public\\events\\" + filename))
 
-
-
-			val name = request.body.dataParts.getOrElse("name","").toString
-			val dateString = request.body.dataParts.getOrElse("date","").toString
-			val location = request.body.dataParts.getOrElse("location","").toString
-			val description = request.body.dataParts.getOrElse("description","").toString
+			val name = request.body.dataParts("name").head
+			val dateString = request.body.dataParts("date").head
+			//val location = request.body.dataParts.getOrElse("location", Vector("")).head
+			val description = request.body.dataParts("description").head
 			val creatorName = request.session.get("username").orNull
 
-
-
-			val date : Timestamp= Timestamp.valueOf(dateString.toString)
+			val date : Timestamp = Timestamp.valueOf(dateString)
 			val creator = Await.result(userRepo.findByName(creatorName), Duration(10, "seconds")).head.id
 
-
-			if(Await.result(eventRepo.createEvent(name,date,location,description,creator,0), Duration(10, "seconds")) != null &&
-					Await.result(pictureRepo.createPicture(filename), Duration(10, "seconds")) != null)
-				Redirect(routes.Application.dashboard())
+			val pictureId : Long = Await.result(pictureRepo.createPicture(filename), Duration(10, "seconds"))
+			if(picture != null && Await.result(eventRepo.createEvent(name,date,"",description,creator,pictureId), Duration(10, "seconds")) != null)
+				Redirect(routes.Application.event(pictureId))
 			else
-				Redirect(routes.Application.dashboard())
+				Redirect(routes.Application.dashboard()).flashing(
+					"error" -> "Missing file")
 		}.getOrElse {
 			Redirect(routes.Application.dashboard()).flashing(
 				"error" -> "Missing file")
 		}
-
-
-
 	}
 
 	def editEvent(id: Long) = Action { request =>
 		if (!secured.isLoggedIn(request)) {
 			Redirect(routes.Application.login())
 		} else {
-			val event = Event(0, "Paleo festival", Timestamp.valueOf("2018-12-20 08:30:45"),"L'asse", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eget turpis tincidunt, cursus dolor quis, luctus ipsum. Cras vulputate pellentesque lacus. Nullam pellentesque luctus felis id ultrices. In pharetra est a ipsum cursus, quis luctus tortor ultricies. Curabitur consectetur gravida tellus, quis tincidunt risus. Nunc egestas imperdiet magna in laoreet. Etiam condimentum iaculis euismod. Suspendisse iaculis, turpis non molestie lobortis, quam nibh semper metus, vel luctus magna massa eget urna. Nullam faucibus euismod diam id cursus. In sed risus nec arcu scelerisque posuere. Donec vel elit sed odio cursus suscipit. Donec pretium arcu eu placerat scelerisque. Ut sit amet urna tempus, congue quam pharetra, cursus purus.\n\nDonec condimentum pellentesque justo, non eleifend sem tincidunt quis. Proin justo nunc, blandit quis congue et, venenatis ac magna. Sed quis maximus ipsum, non blandit lectus. Ut non erat non velit vestibulum sagittis sed at urna. Etiam tellus eros, tristique quis tortor ut, rutrum viverra dolor. Praesent bibendum nec tellus sed consequat. Cras ac metus dui. Mauris placerat sem nec tempus vulputate. Donec sit amet molestie diam, ut luctus libero.\n\nNulla consectetur felis id ultrices ultricies. Fusce ornare tempor orci quis gravida. Praesent mollis, enim eget varius rhoncus, diam mi tristique sem, sit amet congue arcu risus ac nisi. Nulla iaculis, risus non posuere elementum, eros quam sagittis purus, fermentum gravida neque nulla sed urna. Suspendisse accumsan aliquet lorem ac ultrices. Maecenas maximus eleifend rhoncus. Ut ultricies, neque sit amet sodales imperdiet, lorem nulla lobortis tortor, sed imperdiet enim purus et justo. Integer sed posuere odio, id feugiat metus. Nam lectus mauris, auctor ac facilisis eget, porta nec orci. Quisque in justo varius, vestibulum velit eget, ultrices ante. Ut consectetur tincidunt varius. Praesent bibendum nisi id mauris vulputate, nec pulvinar ante tincidunt. Quisque venenatis, lorem a eleifend faucibus, dolor ipsum tempus leo, in dapibus magna nunc quis ex.", 1, 1)
-			Ok(views.html.editEvent(secured.isLoggedIn(request), Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull, event))
+			val event = Await.result(eventRepo.findById(id), Duration(10, "seconds"))
+			val picture = Await.result(pictureRepo.findById(event.picture), Duration(10, "seconds"))
+			Ok(views.html.editEvent(secured.isLoggedIn(request), Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull, event, picture))
 		}
 	}
 

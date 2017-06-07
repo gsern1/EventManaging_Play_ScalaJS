@@ -1,4 +1,4 @@
-@(isLoggedIn: Boolean, user: User, event: Event)
+@(isLoggedIn: Boolean, user: User, event: Event, picture: Picture)
 
 @main("Dashboard", isLoggedIn, user) {
     <form>
@@ -10,7 +10,7 @@
                 <hr/>
                 <div class="row">
                     <div class="col-md-6">
-                        <img src="http://www.events-gallery.ch/Images/Photos/Events/Clubbing/2013/20130503_051_19095/flyer_front_19095.png" alt="Seth Frazier" class="img-responsive" /><br/>
+                        <img src="@event.picture" alt="Seth Frazier" class="img-responsive" /><br/>
                         <input type="file" class="form-control"/>
                     </div>
                     <div class="col-md-6">

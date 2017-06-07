@@ -44,6 +44,9 @@ class EventRepo @Inject()(pictureRepo: PictureRepo)(protected val dbConfigProvid
 	def findByUserId(creatorId: Long): Future[List[Event]] =
 		db.run(Events.filter(_.creator === creatorId).to[List].result)
 
+	def findAll(): Future[List[Event]] =
+		db.run(Events.to[List].result)
+
 
 
 	def partialUpdate(id: Long, name: Option[String], date: Option[Timestamp], location: Option[String],description: Option[String], creator: Option[Long], picture:Option[Long]): Future[Int] = {
