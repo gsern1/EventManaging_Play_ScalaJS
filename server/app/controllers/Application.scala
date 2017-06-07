@@ -125,6 +125,7 @@ class Application @Inject()(userRepo: UserRepo, eventRepo: EventRepo, pictureRep
 		}
 
 
+
 	}
 
 	def editEvent(id: Long) = Action { request =>

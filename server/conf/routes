@@ -23,8 +23,8 @@ GET         /event/:id           controllers.Application.event(id: Long)
 POST        /event               controllers.Application.createEvent
 
 
-GET         /event/:id/edit      controllers.Application.editEvent(id: Long)
 
+GET         /event/:id/edit      controllers.Application.editEvent(id: Long)
 
 # API
 # Message
