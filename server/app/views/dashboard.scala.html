@@ -4,7 +4,7 @@
     <div class="row">
         <div class="col-md-6">
             <h2>Create Event</h2>
-            <form role="form" action="/event" method="POST">
+            <form role="form" action="/event" enctype="multipart/form-data" method="POST">
                 <div class="form-group">
                     <div class="input-group">
                         <span class="input-group-addon">
@@ -13,7 +13,7 @@
                         <input class="form-control" placeholder="Name" name="name" type="text" autofocus>
                     </div>
                 </div>
-                <div class="form-group"> <!-- Date Input -->
+                <div class="form-group"> <!— Date Input —>
                     <div class='input-group date' id='date'>
                         <input type='text' class="form-control" name="date" />
                         <span class="input-group-addon">
@@ -29,6 +29,9 @@
                         </span>
                         <input class="form-control" placeholder="Description" name="description" type="text" autofocus>
                     </div>
+                </div>
+                <div class="input-group">
+                    <input type="file" name="picture">
                 </div>
                 <div class="form-group">
                     <input type="submit" class="btn btn-lg btn-primary btn-block" value="Create">
