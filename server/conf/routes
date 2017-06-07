@@ -22,9 +22,8 @@ GET         /logout              controllers.Application.logout
 GET         /event/:id           controllers.Application.event(id: Long)
 POST        /event               controllers.Application.createEvent
 
-
-
 GET         /event/:id/edit      controllers.Application.editEvent(id: Long)
+POST         /event/:id/edit      controllers.Application.editEventPost(id: Long)
 
 # API
 # Message

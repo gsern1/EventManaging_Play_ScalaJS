@@ -101,11 +101,11 @@ class Application @Inject()(userRepo: UserRepo, eventRepo: EventRepo, pictureRep
 			import java.io.File
 			//val filename = java.util.UUID.randomUUID.toString + "." + picture.filename.split(".").last
 			var filename = picture.filename
-			picture.ref.moveTo(new File("D:\\Cours HEIG 2016-2017 S2\\Scala\\EventManaging_Play_ScalaJS\\server\\public\\events\\" + filename))
+			picture.ref.moveTo(new File(System.getProperty("user.dir") + "/server/public/events/" + filename))
 
 			val name = request.body.dataParts("name").head
 			val dateString = request.body.dataParts("date").head
-			//val location = request.body.dataParts.getOrElse("location", Vector("")).head
+			val location = request.body.dataParts("location").head
 			val description = request.body.dataParts("description").head
 			val creatorName = request.session.get("username").orNull
 
@@ -113,7 +113,7 @@ class Application @Inject()(userRepo: UserRepo, eventRepo: EventRepo, pictureRep
 			val creator = Await.result(userRepo.findByName(creatorName), Duration(10, "seconds")).head.id
 
 			val pictureId : Long = Await.result(pictureRepo.createPicture(filename), Duration(10, "seconds"))
-			if(picture != null && Await.result(eventRepo.createEvent(name,date,"",description,creator,pictureId), Duration(10, "seconds")) != null)
+			if(picture != null && Await.result(eventRepo.createEvent(name,date,location,description,creator,pictureId), Duration(10, "seconds")) != null)
 				Redirect(routes.Application.event(pictureId))
 			else
 				Redirect(routes.Application.dashboard()).flashing(
@@ -134,5 +134,33 @@ class Application @Inject()(userRepo: UserRepo, eventRepo: EventRepo, pictureRep
 		}
 	}
 
+	def editEventPost(id: Long) = Action (parse.multipartFormData){ request =>
+
+		request.body.file("picture").map { picture =>
+			import java.io.File
+			//val filename = java.util.UUID.randomUUID.toString + "." + picture.filename.split(".").last
+			var filename = picture.filename
+			picture.ref.moveTo(new File(System.getProperty("user.dir") + "/server/public/events/" + filename))
+
+			val name = request.body.dataParts("name").head
+			val dateString = request.body.dataParts("date").head
+			val location = request.body.dataParts("location").head
+			val description = request.body.dataParts("description").head
+			val creatorName = request.session.get("username").orNull
+
+			val date : Timestamp = Timestamp.valueOf(dateString)
+			val creator = Await.result(userRepo.findByName(creatorName), Duration(10, "seconds")).head.id
+
+			val pictureId : Long = Await.result(pictureRepo.createPicture(filename), Duration(10, "seconds"))
+			if(picture != null && Await.result(eventRepo.updateEvent(id, name,date,location,description,creator,pictureId), Duration(10, "seconds")) != null)
+				Redirect(routes.Application.event(pictureId))
+			else
+				Redirect(routes.Application.dashboard()).flashing(
+					"error" -> "Missing file")
+		}.getOrElse {
+			Redirect(routes.Application.dashboard()).flashing(
+				"error" -> "Missing file")
+		}
+	}
 }
 

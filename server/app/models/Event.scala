@@ -12,7 +12,7 @@ import play.api.db.slick.DatabaseConfigProvider
 import slick.driver.JdbcProfile
 import java.sql.Timestamp
 
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, Awaitable, Future}
 
 
 
@@ -29,8 +29,7 @@ case class Event(id: Long, name: String, date: Timestamp, location:String, descr
 
 
 class EventRepo @Inject()(pictureRepo: PictureRepo)(protected val dbConfigProvider: DatabaseConfigProvider) {
-
-	val dbConfig = dbConfigProvider.get[JdbcProfile]
+  val dbConfig = dbConfigProvider.get[JdbcProfile]
 	val db = dbConfig.db
 	import dbConfig.driver.api._
 
@@ -76,9 +75,11 @@ class EventRepo @Inject()(pictureRepo: PictureRepo)(protected val dbConfigProvid
 
 	}
 
+	def updateEvent(id: Long, name: String, date: Timestamp, location:String, description: String, creator: Long, picture: Long)= {
+		val query = Events.insertOrUpdate(Event(id, name, date, location, description, creator, picture))
 
-
-
+		db.run(query)
+	}
 
 	private[models] class EventsTable(tag: Tag) extends Table[Event](tag, "events") {
 

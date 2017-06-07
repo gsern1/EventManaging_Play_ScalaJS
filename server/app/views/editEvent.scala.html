@@ -1,27 +1,41 @@
 @(isLoggedIn: Boolean, user: User, event: Event, picture: Picture)
 
 @main("Dashboard", isLoggedIn, user) {
-    <form>
+    <form role="form" enctype="multipart/form-data" method="POST">
         <div class="row">
             <div class="col-md-12">
                 <h2>Name</h2>
-                <input type="text" class="form-control" placeholder="Enter the name..." value="@event.name"/><br/>
+                <input type="text" class="form-control" placeholder="Enter the name..." value="@event.name" name="name"/><br/>
                 <i>Created by @event.creator</i>
                 <hr/>
                 <div class="row">
                     <div class="col-md-6">
-                        <img src="@event.picture" alt="Seth Frazier" class="img-responsive" /><br/>
+                        <img src="@routes.Assets.versioned("events/" + picture.url)" alt="Seth Frazier" class="img-responsive" name="location"/><br/>
                         <input type="file" class="form-control"/>
                     </div>
                     <div class="col-md-6">
                         <h2>
                             Description
                         </h2>
-                        <textarea class="form-control" placeholder="Enter the description..." rows="20">@event.description</textarea>
+                        <textarea class="form-control" placeholder="Enter the description..." rows="20" name="description">@event.description</textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <h2>
+                            Date
+                        </h2>
+                        <div class="form-group col-md-6">
+                            <div class='input-group date' id='date'>
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar">
+                                    </span>
+                                </span>
+                                <input class="form-control" placeholder="Enter the date..." name="date" value="@event.date">
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-6">
                         <h2>Location</h2>
-                        <input type="text" class="form-control" placeholder="Enter the location..."/><br/>
+                        <input type="text" class="form-control" placeholder="Enter the location..." name="location"/><br/>
                         <iframe src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d2965.0824050173574!2d-93.63905729999999!3d41.998507000000004!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1sWebFilings%2C+University+Boulevard%2C+Ames%2C+IA!5e0!3m2!1sen!2sus!4v1390839289319" width="100%" height="350" frameborder="0" style="border:0"></iframe>
                     </div>
                 </div>
@@ -30,4 +44,10 @@
             </div>
         </div>
     </form>
+
+    <script type="text/javascript">
+            $(function () {
+                $('#date').datetimepicker({format: "YYYY-MM-DD HH:mm:ss"});
+            });
+    </script>
 }

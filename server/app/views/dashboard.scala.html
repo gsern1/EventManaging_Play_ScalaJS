@@ -2,10 +2,10 @@
 
 @main("Dashboard", isLoggedIn, user) {
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-12">
             <h2>Create Event</h2>
             <form role="form" action="/event" enctype="multipart/form-data" method="POST">
-                <div class="form-group">
+                <div class="form-group col-md-6">
                     <div class="input-group">
                         <span class="input-group-addon">
                             <i class="glyphicon glyphicon-plus"></i>
@@ -13,28 +13,31 @@
                         <input class="form-control" placeholder="Name" name="name" type="text" autofocus>
                     </div>
                 </div>
-                <div class="form-group"> <!— Date Input —>
+                <div class="form-group col-md-6">
                     <div class='input-group date' id='date'>
-                        <input type='text' class="form-control" name="date" />
                         <span class="input-group-addon">
                             <span class="glyphicon glyphicon-calendar">
                             </span>
                         </span>
+                        <input type='text' class="form-control" placeholder="Date" name="date" />
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group col-md-12">
+                    <textarea class="form-control" placeholder="Description" name="description" rows="6"></textarea>
+                </div>
+                <div class="form-group col-md-6">
+                    <input type="file" name="picture" class="form-control">
+                </div>
+                <div class="form-group col-md-6">
                     <div class="input-group">
                         <span class="input-group-addon">
-                            <i class="glyphicon glyphicon-info-sign"></i>
+                            <i class="glyphicon glyphicon-map-marker"></i>
                         </span>
-                        <input class="form-control" placeholder="Description" name="description" type="text" autofocus>
+                        <input class="form-control" placeholder="Location" name="location" type="text">
                     </div>
                 </div>
-                <div class="input-group">
-                    <input type="file" name="picture">
-                </div>
                 <div class="form-group">
-                    <input type="submit" class="btn btn-lg btn-primary btn-block" value="Create">
+                    <input type="submit" class="btn btn-lg btn-primary pull-right" value="Create">
                 </div>
             </form>
         </div>
