@@ -20,7 +20,7 @@ import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
 
 
-class Application @Inject()(userRepo: UserRepo, eventRepo: EventRepo, pictureRepo: PictureRepo, secured: Secured) extends Controller {
+class Application @Inject()(userRepo: UserRepo, eventRepo: EventRepo, pictureRepo: PictureRepo, messageRepo: MessageRepo, secured: Secured) extends Controller {
 
 	def index = Action { request =>
 		Ok(views.html.index(secured.isLoggedIn(request), Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull))
@@ -91,7 +91,8 @@ class Application @Inject()(userRepo: UserRepo, eventRepo: EventRepo, pictureRep
 		} else {
 			val event = Await.result(eventRepo.findById(id), Duration(10, "seconds"))
 			val picture = Await.result(pictureRepo.findById(event.picture), Duration(10, "seconds"))
-			Ok(views.html.event(secured.isLoggedIn(request), Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull, event, picture))
+			val messages = Await.result(messageRepo.findByEvent(event.id), Duration(10, "seconds"))
+			Ok(views.html.event(secured.isLoggedIn(request), Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull, event, picture, messages))
 		}
 	}
 
@@ -99,6 +100,7 @@ class Application @Inject()(userRepo: UserRepo, eventRepo: EventRepo, pictureRep
 
 		request.body.file("picture").map { picture =>
 			import java.io.File
+			// TODO Generate unique file name with uuid as below
 			//val filename = java.util.UUID.randomUUID.toString + "." + picture.filename.split(".").last
 			var filename = picture.filename
 			picture.ref.moveTo(new File(System.getProperty("user.dir") + "/server/public/events/" + filename))
