@@ -153,7 +153,7 @@ class Application @Inject()(userRepo: UserRepo, eventRepo: EventRepo, pictureRep
 
 			val pictureId : Long = Await.result(pictureRepo.createPicture(filename), Duration(10, "seconds"))
 			if(picture != null && Await.result(eventRepo.updateEvent(id, name,date,location,description,creator,pictureId), Duration(10, "seconds")) != null)
-				Redirect(routes.Application.event(pictureId))
+				Redirect(routes.Application.event(id))
 			else
 				Redirect(routes.Application.dashboard()).flashing(
 					"error" -> "Missing file")
