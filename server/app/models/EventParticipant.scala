@@ -68,11 +68,13 @@ class EventParticipantRepo @Inject()(protected val dbConfigProvider: DatabaseCon
 
 		def pk = primaryKey("primaryKey", (eventID,userID))
 
+		/*
+
 		def eventFK = foreignKey("FK_EVENTS",eventID, TableQuery[Event])(recording =>
 			recording.id , onDelete=ForeignKeyAction.Cascade)
 
 		def userFK = foreignKey("FK_EVENTS",eventID, TableQuery[Event])(recording =>
-			recording.id , onDelete=ForeignKeyAction.Cascade)
+			recording.id , onDelete=ForeignKeyAction.Cascade)*/
 
 	}
 
