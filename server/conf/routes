@@ -25,6 +25,9 @@ POST        /event               controllers.Application.createEvent
 GET         /event/:id/edit      controllers.Application.editEvent(id: Long)
 POST        /event/:id/edit      controllers.Application.editEventPost(id: Long)
 
+# Participation
+POST        /events/:id/participation   controllers.API.participate(id: Long)
+
 # API
 # Message
 POST        /events/:id/messages   controllers.API.sendMessage(id: Long)

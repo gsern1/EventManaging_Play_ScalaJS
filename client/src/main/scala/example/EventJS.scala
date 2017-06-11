@@ -72,6 +72,7 @@ object EventJS extends js.JSApp {
         g.alert(e.toString)
     }
   }
+
   def updateLocation(): Unit = {
     dom.document.getElementById("maps").setAttribute("src", "https://www.google.com/maps?q=" + dom.document.getElementById("location").asInstanceOf[html.Input].value + "&output=embed")
   }

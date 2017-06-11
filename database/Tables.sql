@@ -46,3 +46,13 @@ CREATE TABLE `messages` (
   KEY `fk_event_idx` (`event`),
   CONSTRAINT `fk_event` FOREIGN KEY (`event`) REFERENCES `events` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `event_participant` (
+  `event_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  PRIMARY KEY (`event_id`,`user_id` ),
+  KEY `fk_event_idx` (`event_id`),
+  CONSTRAINT `fk_event_id` FOREIGN KEY (`event`) REFERENCES `events` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  KEY `fk_user_idx` (`user_id`),
+  CONSTRAINT `fk_user_id` FOREIGN KEY (`user`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
