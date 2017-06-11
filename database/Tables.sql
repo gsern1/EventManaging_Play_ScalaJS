@@ -23,7 +23,7 @@ CREATE TABLE `events` (
   `date` DATETIME NOT NULL,
   `description` varchar(45) DEFAULT NULL,
   `creator` int(11) NOT NULL,
-  `picture` int(11) NOT NULL,
+  `picture` int(11) NULL,
   `location` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`),

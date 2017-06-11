@@ -1,4 +1,4 @@
-@(isLoggedIn: Boolean, user: User, events: List[Event], pictures: List[Picture], error: String = "")
+@(isLoggedIn: Boolean, user: User, events: List[Event], pictures: List[Option[Picture]], error: String = "")
 
 @main("Dashboard", isLoggedIn, user) {
     <div class="row">
@@ -49,12 +49,17 @@
             @for((event, index) <- events.zipWithIndex){
                 <li class="list-group-item">
                     <div class="col-xs-12 col-sm-3">
-                        <img src="@routes.Assets.versioned("events/" + pictures(index).url)" alt="" class="img-responsive" />
+                    @if(pictures(index).isDefined) {
+                        <img src="@routes.Assets.versioned("events/" + pictures(index).get.url)" alt="" class="img-responsive" />
+                    } else {
+                        <img src="@routes.Assets.versioned("images/default.png")" alt="" class="img-responsive" />
+                    }
                     </div>
                     <div class="col-xs-12 col-sm-9">
                         <span class="name"><a href="/event/@event.id">@event.name</a></span><br/>
                         <span class="description">@event.description</span><br/>
-                        <span class="date">@event.date</span>
+                        <span class="date">@event.date</span><br/>
+                        <span class="date" style="color: green">Participating</span>
                     </div>
                     <div class="clearfix"></div>
                 </li>

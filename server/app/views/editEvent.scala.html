@@ -1,4 +1,4 @@
-@(isLoggedIn: Boolean, user: User, event: Event, picture: Picture)
+@(isLoggedIn: Boolean, user: User, event: Event, picture: Option[Picture])
 
 @main("Dashboard", isLoggedIn, user) {
     <form role="form" enctype="multipart/form-data" method="POST">
@@ -10,7 +10,11 @@
                 <hr/>
                 <div class="row">
                     <div class="col-md-6">
-                        <img src="@routes.Assets.versioned("events/" + picture.url)" alt="Seth Frazier" class="img-responsive"/><br/>
+                        @if(picture.isDefined) {
+                            <img src="@routes.Assets.versioned("events/" + picture.get.url)" alt="" class="img-responsive" />
+                        } else {
+                            <img src="@routes.Assets.versioned("images/default.png")" alt="" class="img-responsive" />
+                        }<br/>
                         <input type="file" class="form-control" name="picture"/>
                     </div>
                     <div class="col-md-6">

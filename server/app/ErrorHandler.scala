@@ -20,13 +20,17 @@ class ErrorHandler @Inject()(userRepo: UserRepo, eventRepo: EventRepo, pictureRe
         Future.successful(
           NotFound(views.html.notFound(secured.isLoggedIn(request), Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull))
         )
+      case _ =>
+        Future.successful(
+          InternalServerError("A client error occurred: " + message)
+        )
     }
 }
 
 def onServerError(request: RequestHeader, exception: Throwable) = {
   exception.printStackTrace()
   Future.successful(
-    InternalServerError("A server error occurred: " + request)
+    InternalServerError("A server error occurred: " + exception.getMessage)
   )
 }
 }

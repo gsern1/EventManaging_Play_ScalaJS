@@ -1,4 +1,7 @@
-@(isLoggedIn: Boolean, user: User, event: Event, creator: User, picture: Picture, messages: List[Message])
+@import java.time.format.DateTimeFormatter
+@import java.text.SimpleDateFormat
+@import DTO.MessageDTO
+@(isLoggedIn: Boolean, user: User, event: Event, creator: User, picture: Option[Picture], messages: List[MessageDTO], formatter: SimpleDateFormat)
 
 @main("Dashboard", isLoggedIn, user) {
     <div class="row">
@@ -12,7 +15,11 @@
             <hr/>
             <div class="row">
                 <div class="col-md-6">
-                    <img src="@routes.Assets.versioned("events/" + picture.url)" alt="" class="img-responsive" />
+                    @if(picture.isDefined) {
+                        <img src="@routes.Assets.versioned("events/" + picture.get.url)" alt="" class="img-responsive" />
+                    } else {
+                        <img src="@routes.Assets.versioned("images/default.png")" alt="" class="img-responsive" />
+                    }
                 </div>
                 <div class="col-md-6">
                     <h2>
@@ -24,7 +31,7 @@
                     <h2>
                         Date
                     </h2>
-                    <p>@event.date</p>
+                    <p>@formatter.format(event.date)</p>
                 </div>
                 <div class="col-md-6">
                     <h2>Location</h2>
@@ -44,7 +51,7 @@
                 <div class="message">
                     <p>@message.value</p>
                     <i class="pull-right">Created by @message.creator</i>
-                    <i>Sent at @message.date</i>
+                    <i>Sent at @formatter.format(message.date)</i>
                 </div>
                 <hr/>
             }

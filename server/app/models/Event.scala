@@ -16,7 +16,7 @@ import scala.concurrent.{Await, Awaitable, Future}
 
 
 
-case class Event(id: Long, name: String, date: Timestamp, location:String, description: String, creator: Long, picture : Long) {
+case class Event(id: Long, name: String, date: Timestamp, location:String, description: String, creator: Long, picture : Option[Long]) {
 
 	def patch(name: Option[String], date: Option[Timestamp],  location: Option[String],  description: Option[String], creator: Option[Long], picture : Option[Long] ): Event =
 		this.copy(name = name.getOrElse(this.name),
@@ -24,7 +24,7 @@ case class Event(id: Long, name: String, date: Timestamp, location:String, descr
 			location = location.getOrElse(this.location),
 			description = description.getOrElse(this.description),
 			creator = creator.getOrElse(this.creator),
-			picture = picture.getOrElse(this.picture))
+			picture = picture)
 }
 
 
@@ -63,19 +63,14 @@ class EventRepo @Inject()(pictureRepo: PictureRepo)(protected val dbConfigProvid
 	def all(): DBIO[Seq[Event]] =
 		Events.result
 
-	def createEvent(name: String, date: Timestamp, location:String, description: String, creator: Long, picture: Long): Future[Long] = {
-
-		//val creator = Await.result(userRepo.findByName(creatorName), Duration(10, "seconds")).head.id;
-
-		//val format : DateTimeFormatter = DateTimeFormat.forPattern("YYYY-MM-DD HH:MM")
-		//val datetime : Date = format(date)
+	def createEvent(name: String, date: Timestamp, location:String, description: String, creator: Long, picture: Option[Long]): Future[Long] = {
 
 		val event = Event(0,name,date,location,description,creator,picture)
 		db.run(Events returning Events.map(_.id) += event)
 
 	}
 
-	def updateEvent(id: Long, name: String, date: Timestamp, location:String, description: String, creator: Long, picture: Long)= {
+	def updateEvent(id: Long, name: String, date: Timestamp, location:String, description: String, creator: Long, picture: Option[Long])= {
 		val query = Events.filter(_.id === id).update(Event(id, name, date, location, description, creator, picture))
 
 		db.run(query)
@@ -91,10 +86,9 @@ class EventRepo @Inject()(pictureRepo: PictureRepo)(protected val dbConfigProvid
 		def location = column[String]("location")
 		def description = column[String]("description")
 		def creator = column[Long]("creator")
-		def picture = column[Long]("picture")
+		def picture = column[Option[Long]]("picture")
 
 		def * = (id, name, date, location, description, creator, picture) <> (Event.tupled, Event.unapply)
-		def ? = (id.?, name.?, date.?, location.?, description.?, creator.?, picture.?).shaped.<>({ r => import r._; _1.map(_ => Event.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get, _7.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
 	}
 
 
