@@ -92,7 +92,8 @@ class Application @Inject()(userRepo: UserRepo, eventRepo: EventRepo, pictureRep
 			val event = Await.result(eventRepo.findById(id), Duration(10, "seconds"))
 			val picture = Await.result(pictureRepo.findById(event.picture), Duration(10, "seconds"))
 			val messages = Await.result(messageRepo.findByEvent(event.id), Duration(10, "seconds"))
-			Ok(views.html.event(secured.isLoggedIn(request), Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull, event, picture, messages))
+			val creator = Await.result(userRepo.findById(event.creator), Duration(10, "seconds"))
+			Ok(views.html.event(secured.isLoggedIn(request), Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull, event, creator.orNull, picture, messages))
 		}
 	}
 

@@ -1,4 +1,4 @@
-@(isLoggedIn: Boolean, user: User, event: Event, picture: Picture, messages: List[Message])
+@(isLoggedIn: Boolean, user: User, event: Event, creator: User, picture: Picture, messages: List[Message])
 
 @main("Dashboard", isLoggedIn, user) {
     <div class="row">
@@ -8,7 +8,7 @@
             <button class="btn btn-danger pull-right" style="margin: 5px; margin-top: 20px;">Don't participate</button>
             <a href="/event/@event.id/edit" class="btn btn-warning pull-right" style="margin: 5px; margin-top: 20px;">Edit event</a>
             <h2>@event.name</h2>
-            <i>Created by @event.creator</i>
+            <i>Created by @creator.username</i>
             <hr/>
             <div class="row">
                 <div class="col-md-6">
