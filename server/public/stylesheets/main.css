@@ -4,6 +4,9 @@ body {
 .container{
     width: 100%;
 }
+.hidden{
+    display: none;
+}
 
 /* HEADER */
 .navbar-inverse .navbar-brand {

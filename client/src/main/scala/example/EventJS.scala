@@ -41,6 +41,18 @@ object EventJS extends js.JSApp {
         updateLocation()
       }, false)
     }
+
+    if(dom.document.getElementById("participate") != null){
+      dom.document.getElementById("participate").addEventListener("click", { (e0: dom.Event) =>
+        participate()
+      }, false)
+    }
+
+    if(dom.document.getElementById("dontParticipate") != null){
+      dom.document.getElementById("dontparticipate").addEventListener("click", { (e0: dom.Event) =>
+        dontParticipate()
+      }, false)
+    }
   }
   def sendMessage(): Unit = {
     val url = "/events/" + dom.document.getElementById("eventId").getAttribute("value") + "/messages"
@@ -62,5 +74,29 @@ object EventJS extends js.JSApp {
   }
   def updateLocation(): Unit = {
     dom.document.getElementById("maps").setAttribute("src", "https://www.google.com/maps?q=" + dom.document.getElementById("location").asInstanceOf[html.Input].value + "&output=embed")
+  }
+  def participate(): Unit = {
+    val url = "/events/" + dom.document.getElementById("eventId").getAttribute("value") + "/participation"
+    val f = Ajax.post(url)
+    f.onComplete{
+      case Success(xhr) =>
+        dom.document.getElementById("dontParticipate").setAttribute("class", "")
+        dom.document.getElementById("participate").setAttribute("class", "hidden")
+      case Failure(e) =>
+        println(e.toString)
+        g.alert(e.toString)
+    }
+  }
+  def dontParticipate(): Unit = {
+    val url = "/events/" + dom.document.getElementById("eventId").getAttribute("value") + "/participation"
+    val f = Ajax.post(url)
+    f.onComplete{
+      case Success(xhr) =>
+        dom.document.getElementById("participate").setAttribute("class", "")
+        dom.document.getElementById("dontParticipate").setAttribute("class", "hidden")
+      case Failure(e) =>
+        println(e.toString)
+        g.alert(e.toString)
+    }
   }
 }

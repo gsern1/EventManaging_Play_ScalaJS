@@ -1,22 +1,28 @@
 @import java.time.format.DateTimeFormatter
 @import java.text.SimpleDateFormat
 @import DTO.MessageDTO
-@(isLoggedIn: Boolean, user: User, event: Event, creator: User, picture: Option[Picture], messages: List[MessageDTO], formatter: SimpleDateFormat)
+@import DTO.EventDTO
+@(isLoggedIn: Boolean, user: User, event: EventDTO, creator: User, messages: List[MessageDTO], formatter: SimpleDateFormat)
 
 @main("Dashboard", isLoggedIn, user) {
     <div class="row">
         <div class="col-md-12">
             <input type="hidden" id="eventId" value="@event.id">
-            <button class="btn btn-primary pull-right" style="margin: 5px; margin-top: 20px;">Participate</button>
-            <button class="btn btn-danger pull-right" style="margin: 5px; margin-top: 20px;">Don't participate</button>
+            @if(event.participant) {
+                <button class="btn btn-primary pull-right hidden" id="participate" style="margin: 5px; margin-top: 20px;">Participate</button>
+                <button class="btn btn-danger pull-right" id="dontparticipate" style="margin: 5px; margin-top: 20px;">Don't participate</button>
+            } else {
+                <button class="btn btn-primary pull-right" id="participate" style="margin: 5px; margin-top: 20px;">Participate</button>
+                <button class="btn btn-danger pull-right hidden" id=dontparticipate" style="margin: 5px; margin-top: 20px;">Don't participate</button>
+            }
             <a href="/event/@event.id/edit" class="btn btn-warning pull-right" style="margin: 5px; margin-top: 20px;">Edit event</a>
             <h2>@event.name</h2>
             <i>Created by @creator.username</i>
             <hr/>
             <div class="row">
                 <div class="col-md-6">
-                    @if(picture.isDefined) {
-                        <img src="@routes.Assets.versioned("events/" + picture.get.url)" alt="" class="img-responsive" />
+                    @if(event.picture.isDefined) {
+                        <img src="@routes.Assets.versioned("events/" + event.picture.get.url)" alt="" class="img-responsive" />
                     } else {
                         <img src="@routes.Assets.versioned("images/default.png")" alt="" class="img-responsive" />
                     }
