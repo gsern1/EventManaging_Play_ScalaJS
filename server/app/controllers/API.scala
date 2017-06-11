@@ -2,7 +2,9 @@ package controllers
 
 import javax.inject.Inject
 
+import DTO.MessageDTO
 import models.{Event, EventRepo, MessageRepo, UserRepo}
+import play.api.libs.json.Json
 import play.api.mvc._
 import shared.SharedMessages
 
@@ -18,11 +20,9 @@ class API @Inject()(userRepo: UserRepo, eventRepo: EventRepo, secured: Secured, 
 			val value = request.body.asText.get
 			val creatorName = request.session.get("username").orNull
 			val creator = Await.result(userRepo.findByName(creatorName), Duration(10, "seconds")).head.id
-
-			if(Await.result(messageRepo.createMessage(value,creator,id), Duration(10, "seconds")) != null)
-				Created
-			else
-				BadRequest
+			val messageId = Await.result(messageRepo.createMessage(value,creator,id), Duration(10, "seconds"))
+			val date = Await.result(messageRepo.findById(messageId), Duration(10, "seconds")).date
+			Created(Json.toJson(MessageDTO(value,date,creatorName)))
 		}
 	}
 }

@@ -1,9 +1,11 @@
 package example
 
+import DTO.MessageDTO
 import org.scalajs.dom
 import org.scalajs.dom.ext.Ajax
 import org.scalajs.dom.html
 import org.scalajs.dom.raw.HTMLFormElement
+import play.api.libs.json.Json
 import shared.SharedMessages
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -38,9 +40,9 @@ object EventJS extends js.JSApp {
     f.onComplete{
       case Success(xhr) =>
         dom.document.getElementById("messages").innerHTML = " <div class=\"message\">\n" +
-          "<p>" +  dom.document.getElementById("message").asInstanceOf[html.Input].value + "</p>\n" +
-          "<i class=\"pull-right\">Created by @message.creator</i>\n" +
-          "<i>Sent at @message.date</i>\n" +
+          "<p>" +  js.JSON.parse(xhr.responseText).value + "</p>\n" +
+          "<i class=\"pull-right\">Created by " + js.JSON.parse(xhr.responseText).creator + "</i>\n" +
+          "<i>Sent at " + js.JSON.parse(xhr.responseText).date + "</i>\n" +
           "</div>\n" +
           "<hr/>" +
           dom.document.getElementById("messages").innerHTML

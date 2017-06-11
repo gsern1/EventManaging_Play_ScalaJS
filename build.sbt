@@ -28,13 +28,19 @@ lazy val client = (project in file("client")).settings(
   scalaVersion := scalaV,
   scalaJSUseMainModuleInitializer := true,
   libraryDependencies ++= Seq(
-    "org.scala-js" %%% "scalajs-dom" % "latest.release"
+    "org.scala-js" %%% "scalajs-dom" % "latest.release",
+    "mysql" % "mysql-connector-java" % "5.1.34"
+
   )
 ).enablePlugins(ScalaJSPlugin, ScalaJSWeb).
   dependsOn(sharedJs)
 
 lazy val shared = (crossProject.crossType(CrossType.Pure) in file("shared")).
-  settings(scalaVersion := scalaV).
+  settings(scalaVersion := scalaV,
+    libraryDependencies ++= Seq(
+      "com.typesafe.play" %% "play-json" % "2.5.13"
+    )
+  ).
   jsConfigure(_ enablePlugins ScalaJSWeb)
 
 lazy val sharedJvm = shared.jvm
