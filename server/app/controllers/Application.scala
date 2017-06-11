@@ -13,7 +13,7 @@ import play.api.mvc.Results._
 import javax.inject.Inject
 import javax.swing.text.DateFormatter
 
-import DTO.MessageDTO
+import DTO.{EventDTO, MessageDTO, PictureDTO}
 import play.api.Play
 import slick.driver.JdbcProfile
 
@@ -36,8 +36,9 @@ class Application @Inject()(userRepo: UserRepo, eventRepo: EventRepo, pictureRep
 			Redirect(routes.Application.login())
 		else {
 			val events = Await.result(eventRepo.findAll(), Duration(10, "seconds"))
-			val pictures: List[Option[Picture]] = events.map(p => if (p.picture.isDefined) Option(Await.result(pictureRepo.findById(p.picture.get), Duration(10, "seconds"))) else Option.empty)
-			Ok(views.html.dashboard(secured.isLoggedIn(request), Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull, events, pictures))
+			val pastEvents = events.filter(e => e.date.getTime <= System.currentTimeMillis()).sortBy(_.date.getTime).map(e => EventDTO(e.id, e.name, e.date, e.location, e.description, e.creator, if (e.picture.isDefined) Option(PictureDTO((Await.result(pictureRepo.findById(e.picture.get), Duration(10, "seconds"))).url)) else Option.empty))
+			val comingEvents = events.filter(e => e.date.getTime >= System.currentTimeMillis()).sortBy(_.date.getTime).map(e => EventDTO(e.id, e.name, e.date, e.location, e.description, e.creator, if (e.picture.isDefined) Option(PictureDTO((Await.result(pictureRepo.findById(e.picture.get), Duration(10, "seconds"))).url)) else Option.empty))
+			Ok(views.html.dashboard(secured.isLoggedIn(request), Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull, comingEvents, pastEvents))
 		}
 	}
 
@@ -82,7 +83,9 @@ class Application @Inject()(userRepo: UserRepo, eventRepo: EventRepo, pictureRep
 		if (!secured.isLoggedIn(request)) {
 			Redirect(routes.Application.login())
 		} else {
-			Ok(views.html.profile(secured.isLoggedIn(request), Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull))
+			val user = Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull
+			val events = Await.result(eventRepo.findByUserId(user.id), Duration(10, "seconds")).sortBy(_.date.getTime).reverse.map(e => EventDTO(e.id, e.name, e.date, e.location, e.description, e.creator, if (e.picture.isDefined) Option(PictureDTO((Await.result(pictureRepo.findById(e.picture.get), Duration(10, "seconds"))).url)) else Option.empty))
+			Ok(views.html.profile(secured.isLoggedIn(request), user, events))
 		}
 	}
 

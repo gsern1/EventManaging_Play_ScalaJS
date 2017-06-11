@@ -30,9 +30,17 @@ import js.Dynamic.{ global => g }
 
 object EventJS extends js.JSApp {
   def main(): Unit = {
-    dom.document.getElementById("send").addEventListener("click", { (e0: dom.Event) =>
-      sendMessage
-    }, false)
+    if(dom.document.getElementById("send") != null) {
+      dom.document.getElementById("send").addEventListener("click", { (e0: dom.Event) =>
+        sendMessage()
+      }, false)
+    }
+
+    if(dom.document.getElementById("location") != null){
+      dom.document.getElementById("location").asInstanceOf[html.Input].addEventListener("input", { (e0: dom.Event) =>
+        updateLocation()
+      }, false)
+    }
   }
   def sendMessage(): Unit = {
     val url = "/events/" + dom.document.getElementById("eventId").getAttribute("value") + "/messages"
@@ -51,5 +59,8 @@ object EventJS extends js.JSApp {
         println(e.toString)
         g.alert(e.toString)
     }
+  }
+  def updateLocation(): Unit = {
+    dom.document.getElementById("maps").setAttribute("src", "https://www.google.com/maps?q=" + dom.document.getElementById("location").asInstanceOf[html.Input].value + "&output=embed")
   }
 }
