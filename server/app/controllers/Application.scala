@@ -98,6 +98,8 @@ class Application @Inject()(userRepo: UserRepo, eventRepo: EventRepo, pictureRep
 
 	def createEvent = Action (parse.multipartFormData){ request =>
 
+
+
 		request.body.file("picture").map { picture =>
 			import java.io.File
 			// TODO Generate unique file name with uuid as below
