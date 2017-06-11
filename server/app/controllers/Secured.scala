@@ -5,7 +5,7 @@ import java.time.Duration
 import com.google.inject.Inject
 import com.sun.corba.se.impl.orbutil.closure.Future
 import models.{EventRepo, User, UserRepo}
-import play.api.mvc.{Action, Controller, Request, Result}
+import play.api.mvc._
 import play.mvc.Http.Context
 import play.mvc.Controller._
 
@@ -27,7 +27,9 @@ class Secured @Inject()(userRepo: UserRepo) {
       * @param ctx The context.
       * @return The username.
       */
-        def getUsername(request: Request[Any]) = request.session.get("username").orNull
+    def getUsername(request: Request[Any]) = request.session.get("username").orNull
+
+    def getUsername(request: RequestHeader) = request.session.get("username").orNull
 
     /**
       * True if there is a logged in user, false otherwise.
@@ -36,6 +38,10 @@ class Secured @Inject()(userRepo: UserRepo) {
       * @return True if user is logged in.
       */
     def isLoggedIn(request: Request[Any]): Boolean = {
+        getUsername(request) != null //Corriger en ajoutant vérif db
+    }
+
+    def isLoggedIn(request: RequestHeader): Boolean = {
         getUsername(request) != null //Corriger en ajoutant vérif db
     }
 }

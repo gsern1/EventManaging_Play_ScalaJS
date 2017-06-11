@@ -97,15 +97,11 @@ class Application @Inject()(userRepo: UserRepo, eventRepo: EventRepo, pictureRep
 	}
 
 	def createEvent = Action (parse.multipartFormData){ request =>
-
-
-
 		request.body.file("picture").map { picture =>
 			import java.io.File
 			// TODO Generate unique file name with uuid as below
 			//val filename = java.util.UUID.randomUUID.toString + "." + picture.filename.split(".").last
-			var filename = picture.filename
-			picture.ref.moveTo(new File(System.getProperty("user.dir") + "/server/public/events/" + filename))
+			picture.ref.moveTo(new File(System.getProperty("user.dir") + "/server/public/events/" + picture.filename))
 
 			val name = request.body.dataParts("name").head
 			val dateString = request.body.dataParts("date").head
@@ -116,7 +112,7 @@ class Application @Inject()(userRepo: UserRepo, eventRepo: EventRepo, pictureRep
 			val date : Timestamp = Timestamp.valueOf(dateString)
 			val creator = Await.result(userRepo.findByName(creatorName), Duration(10, "seconds")).head.id
 
-			val pictureId : Long = Await.result(pictureRepo.createPicture(filename), Duration(10, "seconds"))
+			val pictureId : Long = Await.result(pictureRepo.createPicture(picture.filename), Duration(10, "seconds"))
 			if(picture != null && Await.result(eventRepo.createEvent(name,date,location,description,creator,pictureId), Duration(10, "seconds")) != null)
 				Redirect(routes.Application.event(pictureId))
 			else
