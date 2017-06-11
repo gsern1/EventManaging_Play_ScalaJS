@@ -1,8 +1,8 @@
 package models
 
 /**
-  * Created by guillaume on 01.06.17.
-  */
+	* Created by guillaume on 01.06.17.
+	*/
 
 
 
@@ -18,15 +18,16 @@ import scala.concurrent.{Await, Awaitable, Future}
 
 
 
-case class EventParticipant(eventID: Long, userID: Long ) {
+case class EventParticipant(id: Long, eventID: Long, userID: Long ) {
 
-	def patch(eventID: Option[Long], userID: Option[Long]): EventParticipant =
-		this.copy(eventID = eventID.getOrElse(this.eventID),
+	def patch(id: Option[Long], eventID: Option[Long], userID: Option[Long]): EventParticipant =
+		this.copy(id=id.getOrElse(this.id),
+			eventID = eventID.getOrElse(this.eventID),
 			userID = userID.getOrElse(this.userID))
 }
 
 
-class EventParticipantRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) {
+class EventParticipantRepo @Inject()(eventRepo: EventRepo, userRepo: UserRepo)(protected val dbConfigProvider: DatabaseConfigProvider) {
 	val dbConfig = dbConfigProvider.get[JdbcProfile]
 	val db = dbConfig.db
 
@@ -34,17 +35,13 @@ class EventParticipantRepo @Inject()(protected val dbConfigProvider: DatabaseCon
 
 	private[models] val EventParticipants = TableQuery[EventParticipantTable]
 
-	def createParticipation(eventID: Long, userID: Long): Future[(Long,Long)] = {
-
-		val participation = EventParticipant(eventID, userID)
-		db.run(EventParticipants returning EventParticipants.map(ep => (ep.eventID,ep.userID)) += participation)
-
+	def createParticipation(eventID: Long, userID: Long): Future[Long] = {
+		val participation = EventParticipant(0, eventID, userID)
+		db.run(EventParticipants returning EventParticipants.map(_.id) += participation)
 	}
 
 	def deleteParticipation(eventID: Long, userID: Long): Future[Int] = {
-
 		db.run(EventParticipants.filter(ep => ep.eventID === eventID && ep.userID === userID).delete)
-
 	}
 
 	def findByEventIdAndUserId(eventID: Long, userID:Long): Future[List[EventParticipant]] =
@@ -59,14 +56,15 @@ class EventParticipantRepo @Inject()(protected val dbConfigProvider: DatabaseCon
 
 	private[models] class EventParticipantTable(tag: Tag) extends Table[EventParticipant](tag, "event_participant") {
 
-		def eventID: Rep[Long] = column[Long]("event_id")
-		def userID: Rep[Long] = column[Long]("user_id")
+		def id = column[Long]("id", O.AutoInc, O.PrimaryKey)
+		def eventID = column[Long]("event_id")
+		def userID = column[Long]("user_id")
 
-		def * = (eventID, userID) <> (EventParticipant.tupled, EventParticipant.unapply)
-		def ? = (eventID.?, userID.?).shaped.<>({ r => import r._; _1.map(_ => EventParticipant.tupled((_1.get, _2.get))) }, (_: Any) => throw new Exception("Inserting into ? messages not supported."))
+		def * = (id, eventID, userID) <> (EventParticipant.tupled, EventParticipant.unapply)
+		def ? = (id.?, eventID.?, userID.?).shaped.<>({ r => import r._; _1.map(_ => EventParticipant.tupled((_1.get, _2.get, _3.get))) }, (_: Any) => throw new Exception("Inserting into ? messages not supported."))
 
 
-		def pk = primaryKey("primaryKey", (eventID,userID))
+		//def pk = primaryKey("primaryKey", (eventID,userID))
 
 		/*
 

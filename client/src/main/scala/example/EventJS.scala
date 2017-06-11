@@ -22,6 +22,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
   * - Ecrire HTML depuis scalajs
   * - Gestion des erreurs dans le frontend (futur)
   * - 404 NOT FOUND
+  * - Erreur de slick invoker.first sans aucune autre information en mode debug
+  * - Impossible de faire une table many to many sans champs id autoincrement primary key
   */
 
 import scala.scalajs.js
@@ -48,7 +50,7 @@ object EventJS extends js.JSApp {
       }, false)
     }
 
-    if(dom.document.getElementById("dontParticipate") != null){
+    if(dom.document.getElementById("dontparticipate") != null){
       dom.document.getElementById("dontparticipate").addEventListener("click", { (e0: dom.Event) =>
         dontParticipate()
       }, false)
@@ -77,12 +79,13 @@ object EventJS extends js.JSApp {
     dom.document.getElementById("maps").setAttribute("src", "https://www.google.com/maps?q=" + dom.document.getElementById("location").asInstanceOf[html.Input].value + "&output=embed")
   }
   def participate(): Unit = {
+
     val url = "/events/" + dom.document.getElementById("eventId").getAttribute("value") + "/participation"
     val f = Ajax.post(url)
     f.onComplete{
       case Success(xhr) =>
-        dom.document.getElementById("dontParticipate").setAttribute("class", "")
-        dom.document.getElementById("participate").setAttribute("class", "hidden")
+        dom.document.getElementById("dontparticipate").setAttribute("class", "btn btn-danger pull-right ")
+        dom.document.getElementById("participate").setAttribute("class", "btn btn-primary pull-right hidden")
       case Failure(e) =>
         println(e.toString)
         g.alert(e.toString)
@@ -93,8 +96,8 @@ object EventJS extends js.JSApp {
     val f = Ajax.post(url)
     f.onComplete{
       case Success(xhr) =>
-        dom.document.getElementById("participate").setAttribute("class", "")
-        dom.document.getElementById("dontParticipate").setAttribute("class", "hidden")
+        dom.document.getElementById("participate").setAttribute("class", "btn btn-primary pull-right ")
+        dom.document.getElementById("dontparticipate").setAttribute("class", "btn btn-danger pull-right hidden")
       case Failure(e) =>
         println(e.toString)
         g.alert(e.toString)

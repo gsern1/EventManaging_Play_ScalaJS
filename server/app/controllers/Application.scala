@@ -21,7 +21,7 @@ import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
 
 
-class Application @Inject()(userRepo: UserRepo, eventRepo: EventRepo, pictureRepo: PictureRepo, messageRepo: MessageRepo, secured: Secured) extends Controller {
+class Application @Inject()(userRepo: UserRepo, eventRepo: EventRepo, pictureRepo: PictureRepo, messageRepo: MessageRepo, eventParticipantRepo: EventParticipantRepo, secured: Secured) extends Controller {
 
 	def index = Action { request =>
 		Ok(views.html.index(secured.isLoggedIn(request), Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull))
@@ -35,9 +35,21 @@ class Application @Inject()(userRepo: UserRepo, eventRepo: EventRepo, pictureRep
 		if (!secured.isLoggedIn(request))
 			Redirect(routes.Application.login())
 		else {
+			val user : User = Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull
 			val events = Await.result(eventRepo.findAll(), Duration(10, "seconds"))
-			val pastEvents = events.filter(e => e.date.getTime <= System.currentTimeMillis()).sortBy(_.date.getTime).map(e => EventDTO(e.id, e.name, e.date, e.location, e.description, e.creator, if (e.picture.isDefined) Option(PictureDTO((Await.result(pictureRepo.findById(e.picture.get), Duration(10, "seconds"))).url)) else Option.empty, true))
-			val comingEvents = events.filter(e => e.date.getTime >= System.currentTimeMillis()).sortBy(_.date.getTime).map(e => EventDTO(e.id, e.name, e.date, e.location, e.description, e.creator, if (e.picture.isDefined) Option(PictureDTO((Await.result(pictureRepo.findById(e.picture.get), Duration(10, "seconds"))).url)) else Option.empty, true))
+			val pastEvents = events.filter(e => e.date.getTime <= System.currentTimeMillis()).sortBy(_.date.getTime).map(e => EventDTO(e.id, e.name, e.date, e.location, e.description, e.creator, if (e.picture.isDefined) Option(PictureDTO(Await.result(pictureRepo.findById(e.picture.get), Duration(10, "seconds")).url)) else Option.empty, !Await.result(eventParticipantRepo.findByEventIdAndUserId(e.id, user.id), Duration(10, "seconds")).isEmpty))
+			val comingEvents = events
+				.filter(e => e.date.getTime >= System.currentTimeMillis())
+				.sortBy(_.date.getTime)
+				.map(e => EventDTO(e.id,
+					e.name,
+					e.date,
+					e.location,
+					e.description,
+					e.creator,
+					if (e.picture.isDefined) Option(PictureDTO(Await.result(pictureRepo.findById(e.picture.get), Duration(10, "seconds")).url))
+					else Option.empty,
+					!Await.result(eventParticipantRepo.findByEventIdAndUserId(e.id, user.id), Duration(10, "seconds")).isEmpty))
 			Ok(views.html.dashboard(secured.isLoggedIn(request), Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull, comingEvents, pastEvents))
 		}
 	}
@@ -93,15 +105,16 @@ class Application @Inject()(userRepo: UserRepo, eventRepo: EventRepo, pictureRep
 		if (!secured.isLoggedIn(request)) {
 			Redirect(routes.Application.login())
 		} else {
+			val user : User = Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull
 			val event = Await.result(eventRepo.findById(id), Duration(10, "seconds"))
 			val messages = Await.result(messageRepo.findByEvent(event.id), Duration(10, "seconds"))
 			val creator = Await.result(userRepo.findById(event.creator), Duration(10, "seconds"))
 			val formatter = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss")
 			if (event.picture.isDefined) {
 				val picture = Await.result(pictureRepo.findById(event.picture.get), Duration(10, "seconds"))
-				Ok(views.html.event(secured.isLoggedIn(request), Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull, EventDTO(event.id, event.name, event.date, event.location, event.description, event.creator, Option(PictureDTO(picture.url)), true), creator.orNull, messages.map(m => MessageDTO(m.value, m.date, Await.result(userRepo.findById(m.creator), Duration(10, "seconds")).orNull.username)), formatter))
+				Ok(views.html.event(secured.isLoggedIn(request), Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull, EventDTO(event.id, event.name, event.date, event.location, event.description, event.creator, Option(PictureDTO(picture.url)), !Await.result(eventParticipantRepo.findByEventIdAndUserId(event.id, user.id), Duration(10, "seconds")).isEmpty), creator.orNull, messages.map(m => MessageDTO(m.value, m.date, Await.result(userRepo.findById(m.creator), Duration(10, "seconds")).orNull.username)), formatter))
 			} else {
-				Ok(views.html.event(secured.isLoggedIn(request), Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull, EventDTO(event.id, event.name, event.date, event.location, event.description, event.creator, Option.empty, true), creator.orNull, messages.map(m => MessageDTO(m.value, m.date, Await.result(userRepo.findById(m.creator), Duration(10, "seconds")).orNull.username)), formatter))
+				Ok(views.html.event(secured.isLoggedIn(request), Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull, EventDTO(event.id, event.name, event.date, event.location, event.description, event.creator, Option.empty, !Await.result(eventParticipantRepo.findByEventIdAndUserId(event.id, user.id), Duration(10, "seconds")).isEmpty), creator.orNull, messages.map(m => MessageDTO(m.value, m.date, Await.result(userRepo.findById(m.creator), Duration(10, "seconds")).orNull.username)), formatter))
 			}
 		}
 	}

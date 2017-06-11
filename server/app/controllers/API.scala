@@ -32,10 +32,10 @@ class API @Inject()(userRepo: UserRepo, eventRepo: EventRepo, secured: Secured, 
 			Unauthorized
 		else{
 			val username = request.session.get("username").orNull
-			val user = Await.result(userRepo.findByName(username), Duration(10, "seconds")).head.id
+			val user = Await.result(userRepo.findByName(username), Duration(10, "seconds")).orNull.id
 
-			if(Await.result(eventParticipantRepo.findByEventIdAndUserId(id,user), Duration(10, "seconds")) != null)
-				if(Await.result(eventParticipantRepo.deleteParticipation(id,user), Duration(10, "seconds")) <= 0)
+			if(!Await.result(eventParticipantRepo.findByEventIdAndUserId(id,user), Duration(10, "seconds")).isEmpty)
+				if(Await.result(eventParticipantRepo.deleteParticipation(id,user), Duration(10, "seconds")) > 0)
 					NoContent
 				else
 					NotFound

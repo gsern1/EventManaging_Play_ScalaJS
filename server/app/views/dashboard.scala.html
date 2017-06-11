@@ -61,7 +61,9 @@
                         <span class="name"><a href="/event/@event.id">@event.name</a></span><br/>
                         <span class="description">@event.description</span><br/>
                         <span class="date">@event.date</span><br/>
-                        <span class="date" style="color: green">Participating</span>
+                        @if(event.participant) {
+                            <span class="date" style="color: green">Participating</span>
+                        }
                     </div>
                     <div class="clearfix"></div>
                 </li>
@@ -84,7 +86,9 @@
                         <span class="name"><a href="/event/@event.id">@event.name</a></span><br/>
                         <span class="description">@event.description</span><br/>
                         <span class="date">@event.date</span><br/>
-                        <span class="date" style="color: green">Participated</span>
+                        @if(event.participant) {
+                            <span class="date" style="color: green">Participated</span>
+                        }
                     </div>
                     <div class="clearfix"></div>
                 </li>
