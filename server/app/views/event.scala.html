@@ -2,7 +2,7 @@
 @import java.text.SimpleDateFormat
 @import DTO.MessageDTO
 @import DTO.EventDTO
-@(isLoggedIn: Boolean, user: User, event: EventDTO, creator: User, messages: List[MessageDTO], formatter: SimpleDateFormat, participants: List[String])
+@(isLoggedIn: Boolean, user: User, event: EventDTO, creator: User, messages: List[MessageDTO], formatter: SimpleDateFormat, participants: List[String], admin: Boolean)
 
 @main("Dashboard", isLoggedIn, user) {
     <div class="row">
@@ -15,7 +15,9 @@
                 <button class="btn btn-primary pull-right" id="participate" style="margin: 5px; margin-top: 20px;">Participate</button>
                 <button class="btn btn-danger pull-right hidden" id="dontparticipate" style="margin: 5px; margin-top: 20px;">Don't participate</button>
             }
-            <a href="/event/@event.id/edit" class="btn btn-warning pull-right" style="margin: 5px; margin-top: 20px;">Edit event</a>
+            @if(admin){
+                <a href="/event/@event.id/edit" class="btn btn-warning pull-right" style="margin: 5px; margin-top: 20px;">Edit event</a>
+            }
             <h2>@event.name</h2>
             <i>Created by @creator.username</i>
             <hr/>
