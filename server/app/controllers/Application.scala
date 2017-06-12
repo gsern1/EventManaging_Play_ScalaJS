@@ -8,7 +8,6 @@ import models._
 import play.api.data.Form
 import play.api.mvc._
 import play.mvc.Controller.{request, _}
-import shared.SharedMessages
 import play.api.mvc.Results._
 import javax.inject.Inject
 import javax.swing.text.DateFormatter
@@ -139,6 +138,7 @@ class Application @Inject()(userRepo: UserRepo, eventRepo: EventRepo, pictureRep
 			picture.ref.moveTo(new File(System.getProperty("user.dir") + "/server/public/events/" + picture.filename))
 			val pictureId = Await.result(pictureRepo.createPicture(picture.filename), Duration(10, "seconds"))
 			val eventId = Await.result(eventRepo.createEvent(name, date, location, description, creator, Option(pictureId)), Duration(10, "seconds"))
+			Await.result(eventParticipantRepo.createParticipation(eventId,creator), Duration(10, "seconds"))
 			Redirect(routes.Application.event(eventId))
 		} else {
 			val eventId = Await.result(eventRepo.createEvent(name, date, location, description, creator, Option.empty), Duration(10, "seconds"))

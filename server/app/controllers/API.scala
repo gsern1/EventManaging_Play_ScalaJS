@@ -6,7 +6,6 @@ import DTO.MessageDTO
 import models._
 import play.api.libs.json.Json
 import play.api.mvc._
-import shared.SharedMessages
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
