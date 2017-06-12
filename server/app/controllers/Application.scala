@@ -172,7 +172,7 @@ class Application @Inject()(userRepo: UserRepo, eventRepo: EventRepo, pictureRep
 		val dateString = request.body.dataParts("date").head
 		val location = request.body.dataParts("location").head
 		val description = request.body.dataParts("description").head
-		val creatorName = request.session.get("username").orNull
+		val creatorName = request.session.get("username").get
 		val date: Timestamp = Timestamp.valueOf(dateString)
 		val creator = Await.result(userRepo.findByName(creatorName), Duration(10, "seconds")).head.id
 
@@ -187,6 +187,14 @@ class Application @Inject()(userRepo: UserRepo, eventRepo: EventRepo, pictureRep
 		}
 	}
 
-  def updateProfile() = play.mvc.Results.TODO
+  def updateProfile() = Action { request =>
+		val username = request.body.asFormUrlEncoded.get("username").head
+		val password = request.body.asFormUrlEncoded.get("password").head
+		val user = Await.result(userRepo.findByName(request.session.get("username").orNull), Duration(10, "seconds")).get
+
+		Await.result(userRepo.updateUser(user.id, username, password), Duration(10, "seconds") )
+
+		Redirect(routes.Application.profile()).withSession("username" -> username)
+	}
 }
 

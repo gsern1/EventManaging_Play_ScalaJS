@@ -70,7 +70,7 @@ class EventRepo @Inject()(pictureRepo: PictureRepo)(protected val dbConfigProvid
 
 	}
 
-	def updateEvent(id: Long, name: String, date: Timestamp, location:String, description: String, creator: Long, picture: Option[Long])= {
+	def updateEvent(id: Long, name: String, date: Timestamp, location:String, description: String, creator: Long, picture: Option[Long]) = {
 		val query = Events.filter(_.id === id).update(Event(id, name, date, location, description, creator, picture))
 
 		db.run(query)

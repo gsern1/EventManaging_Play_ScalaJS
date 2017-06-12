@@ -1,6 +1,7 @@
 package models
 
 
+import java.sql.Timestamp
 import javax.inject.Inject
 
 import com.sun.xml.internal.ws.developer.UsesJAXBContext
@@ -13,7 +14,7 @@ import sun.security.util.Password
 
 import scala.concurrent.ExecutionContext._
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Awaitable, ExecutionContext, Future}
 
 
 /**
@@ -32,6 +33,7 @@ class User(_username: String, _password: String) {
 case class User(id: Long, username:String, password:String)
 
 class UserRepo @Inject()(eventRepo: EventRepo)(protected val dbConfigProvider: DatabaseConfigProvider) {
+
 
     val dbConfig = dbConfigProvider.get[JdbcProfile]
     val db = dbConfig.db
@@ -62,6 +64,12 @@ class UserRepo @Inject()(eventRepo: EventRepo)(protected val dbConfigProvider: D
     def registerUser(username: String, password:String): Future[Long] = {
         val user = User(0,username,password)
         db.run(Users returning Users.map(_.id) += user)
+    }
+
+    def updateUser(id: Long, username: String, password: String) = {
+        val query = Users.filter(_.id === id).update(User(id, username, password))
+
+        db.run(query)
     }
 
     def authenticate(username: String, password: String): Future[Boolean] = {

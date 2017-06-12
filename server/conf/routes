@@ -15,7 +15,7 @@ POST        /register            controllers.Application.registerUser
 
 # Profile and logout
 GET         /profile             controllers.Application.profile
-POST         /profile             controllers.Application.updateProfile
+POST        /profile             controllers.Application.updateProfile
 GET         /dashboard           controllers.Application.dashboard
 GET         /logout              controllers.Application.logout
 
