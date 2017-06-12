@@ -109,11 +109,12 @@ class Application @Inject()(userRepo: UserRepo, eventRepo: EventRepo, pictureRep
 			val messages = Await.result(messageRepo.findByEvent(event.id), Duration(10, "seconds"))
 			val creator = Await.result(userRepo.findById(event.creator), Duration(10, "seconds"))
 			val formatter = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss")
+			val participants = Await.result(eventParticipantRepo.findByEventId(event.id), Duration(10, "seconds")).map(ep => Await.result(userRepo.findById(ep.userID), Duration(10, "seconds")).get.username)
 			if (event.picture.isDefined) {
 				val picture = Await.result(pictureRepo.findById(event.picture.get), Duration(10, "seconds"))
-				Ok(views.html.event(secured.isLoggedIn(request), Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull, EventDTO(event.id, event.name, event.date, event.location, event.description, event.creator, Option(PictureDTO(picture.url)), !Await.result(eventParticipantRepo.findByEventIdAndUserId(event.id, user.id), Duration(10, "seconds")).isEmpty), creator.orNull, messages.map(m => MessageDTO(m.value, m.date, Await.result(userRepo.findById(m.creator), Duration(10, "seconds")).orNull.username)), formatter))
+				Ok(views.html.event(secured.isLoggedIn(request), Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull, EventDTO(event.id, event.name, event.date, event.location, event.description, event.creator, Option(PictureDTO(picture.url)), !Await.result(eventParticipantRepo.findByEventIdAndUserId(event.id, user.id), Duration(10, "seconds")).isEmpty), creator.orNull, messages.map(m => MessageDTO(m.value, m.date, Await.result(userRepo.findById(m.creator), Duration(10, "seconds")).orNull.username)), formatter, participants))
 			} else {
-				Ok(views.html.event(secured.isLoggedIn(request), Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull, EventDTO(event.id, event.name, event.date, event.location, event.description, event.creator, Option.empty, !Await.result(eventParticipantRepo.findByEventIdAndUserId(event.id, user.id), Duration(10, "seconds")).isEmpty), creator.orNull, messages.map(m => MessageDTO(m.value, m.date, Await.result(userRepo.findById(m.creator), Duration(10, "seconds")).orNull.username)), formatter))
+				Ok(views.html.event(secured.isLoggedIn(request), Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull, EventDTO(event.id, event.name, event.date, event.location, event.description, event.creator, Option.empty, !Await.result(eventParticipantRepo.findByEventIdAndUserId(event.id, user.id), Duration(10, "seconds")).isEmpty), creator.orNull, messages.map(m => MessageDTO(m.value, m.date, Await.result(userRepo.findById(m.creator), Duration(10, "seconds")).orNull.username)), formatter, participants))
 			}
 		}
 	}
