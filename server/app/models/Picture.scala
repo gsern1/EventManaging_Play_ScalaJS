@@ -15,7 +15,7 @@ import scala.concurrent.{Await, Future}
 
 
 
-case class Picture(id: Long, url: String)
+case class  Picture(id: Long, url: String)
 
 class PictureRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) {
 

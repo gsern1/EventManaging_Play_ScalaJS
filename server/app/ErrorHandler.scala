@@ -25,12 +25,12 @@ class ErrorHandler @Inject()(userRepo: UserRepo, eventRepo: EventRepo, pictureRe
           InternalServerError("A client error occurred: " + message)
         )
     }
-}
+  }
 
-def onServerError(request: RequestHeader, exception: Throwable) = {
-  exception.printStackTrace()
-  Future.successful(
-    InternalServerError("A server error occurred: " + exception.getMessage)
-  )
-}
+  def onServerError(request: RequestHeader, exception: Throwable) = {
+    exception.printStackTrace()
+    Future.successful(
+      InternalServerError("A server error occurred: " + exception.getMessage)
+    )
+  }
 }

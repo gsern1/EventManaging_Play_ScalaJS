@@ -32,7 +32,7 @@ import js.Dynamic.{ global => g }
 
 object EventJS extends js.JSApp {
   def main(): Unit = {
-    if(dom.document.getElementById("send") != null) {
+    if(dom.document.getElementById("send"). != null) {
       dom.document.getElementById("send").addEventListener("click", { (e0: dom.Event) =>
         sendMessage()
       }, false)
