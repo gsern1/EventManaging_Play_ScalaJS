@@ -13,6 +13,7 @@ import javax.inject.Inject
 import javax.swing.text.DateFormatter
 
 import DTO.{EventDTO, MessageDTO, PictureDTO}
+import play.Configuration
 import play.api.Play
 import slick.driver.JdbcProfile
 
@@ -20,7 +21,7 @@ import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
 
 
-class Application @Inject()(userRepo: UserRepo, eventRepo: EventRepo, pictureRepo: PictureRepo, messageRepo: MessageRepo, eventParticipantRepo: EventParticipantRepo, secured: Secured) extends Controller {
+class Application @Inject()(configuration: Configuration, userRepo: UserRepo, eventRepo: EventRepo, pictureRepo: PictureRepo, messageRepo: MessageRepo, eventParticipantRepo: EventParticipantRepo, secured: Secured) extends Controller {
 
 	def index = Action { request =>
 		Ok(views.html.index(secured.isLoggedIn(request), Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull))
@@ -63,11 +64,12 @@ class Application @Inject()(userRepo: UserRepo, eventRepo: EventRepo, pictureRep
 	def registerUser = Action { request =>
 		val username = request.body.asFormUrlEncoded.get("username").head
 		val password = request.body.asFormUrlEncoded.get("password").head
+		val serverPassword = request.body.asFormUrlEncoded.get("server_password").head
 
-		if (Await.result(userRepo.registerUser(username, password), Duration(10, "seconds")) != null)
+		if (Await.result(userRepo.registerUser(username, password), Duration(10, "seconds")) != null && serverPassword == configuration.getString("server.password"))
 			Redirect(routes.Application.dashboard()).withSession("username" -> username)
 		else
-			Redirect(routes.Application.register()).withNewSession.flashing("Register Failed" -> "Duplicate username or password too short.")
+			Ok(views.html.register(secured.isLoggedIn(request), Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull, "Duplicate username or password too short or wrong server password."))
 	}
 
 	def login = Action { request =>
