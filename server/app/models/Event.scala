@@ -5,7 +5,6 @@ package models
   */
 
 
-
 import javax.inject.Inject
 
 import play.api.db.slick.DatabaseConfigProvider
@@ -14,11 +13,19 @@ import java.sql.Timestamp
 
 import scala.concurrent.{Await, Awaitable, Future}
 
+/**
+  * Model for events
+  * @param id the event's id
+  * @param name the event's name
+  * @param date the event's date
+  * @param location the event's location
+  * @param description the event's description
+  * @param creator the event's creator id
+  * @param picture the event's picture id
+  */
+case class Event(id: Long, name: String, date: Timestamp, location: String, description: String, creator: Long, picture: Option[Long]) {
 
-
-case class Event(id: Long, name: String, date: Timestamp, location:String, description: String, creator: Long, picture : Option[Long]) {
-
-	def patch(name: Option[String], date: Option[Timestamp],  location: Option[String],  description: Option[String], creator: Option[Long], picture : Option[Long] ): Event =
+	def patch(name: Option[String], date: Option[Timestamp], location: Option[String], description: Option[String], creator: Option[Long], picture: Option[Long]): Event =
 		this.copy(name = name.getOrElse(this.name),
 			date = date.getOrElse(this.date),
 			location = location.getOrElse(this.location),
@@ -27,10 +34,15 @@ case class Event(id: Long, name: String, date: Timestamp, location:String, descr
 			picture = picture)
 }
 
-
+/**
+  * Repository for Events, used as a DAO
+  * @param pictureRepo
+  * @param dbConfigProvider
+  */
 class EventRepo @Inject()(pictureRepo: PictureRepo)(protected val dbConfigProvider: DatabaseConfigProvider) {
-  val dbConfig = dbConfigProvider.get[JdbcProfile]
+	val dbConfig = dbConfigProvider.get[JdbcProfile]
 	val db = dbConfig.db
+
 	import dbConfig.driver.api._
 
 	private[models] val Events = TableQuery[EventsTable]
@@ -47,13 +59,12 @@ class EventRepo @Inject()(pictureRepo: PictureRepo)(protected val dbConfigProvid
 		db.run(Events.to[List].result)
 
 
-
-	def partialUpdate(id: Long, name: Option[String], date: Option[Timestamp], location: Option[String],description: Option[String], creator: Option[Long], picture:Option[Long]): Future[Int] = {
+	def partialUpdate(id: Long, name: Option[String], date: Option[Timestamp], location: Option[String], description: Option[String], creator: Option[Long], picture: Option[Long]): Future[Int] = {
 		import scala.concurrent.ExecutionContext.Implicits.global
 
 		val query = Events.filter(_.id === id)
 
-		val update = query.result.head.flatMap {event =>
+		val update = query.result.head.flatMap { event =>
 			query.update(event.patch(name, date, location, description, creator, picture))
 		}
 
@@ -63,29 +74,37 @@ class EventRepo @Inject()(pictureRepo: PictureRepo)(protected val dbConfigProvid
 	def all(): DBIO[Seq[Event]] =
 		Events.result
 
-	def createEvent(name: String, date: Timestamp, location:String, description: String, creator: Long, picture: Option[Long]): Future[Long] = {
+	def createEvent(name: String, date: Timestamp, location: String, description: String, creator: Long, picture: Option[Long]): Future[Long] = {
 
-		val event = Event(0,name,date,location,description,creator,picture)
+		val event = Event(0, name, date, location, description, creator, picture)
 		db.run(Events returning Events.map(_.id) += event)
 
 	}
 
-	def updateEvent(id: Long, name: String, date: Timestamp, location:String, description: String, creator: Long, picture: Option[Long]) = {
+	def updateEvent(id: Long, name: String, date: Timestamp, location: String, description: String, creator: Long, picture: Option[Long]) = {
 		val query = Events.filter(_.id === id).update(Event(id, name, date, location, description, creator, picture))
 
 		db.run(query)
 	}
 
+	/**
+	  * Definition of the events table properties
+	  * @param tag
+	  */
 	private[models] class EventsTable(tag: Tag) extends Table[Event](tag, "events") {
 
-		//implicit val dateColumnType = DateMapper.utilDate2SqlDate
-
 		def id = column[Long]("id", O.AutoInc, O.PrimaryKey)
+
 		def name = column[String]("name")
+
 		def date = column[java.sql.Timestamp]("date")
+
 		def location = column[String]("location")
+
 		def description = column[String]("description")
+
 		def creator = column[Long]("creator")
+
 		def picture = column[Option[Long]]("picture")
 
 		def * = (id, name, date, location, description, creator, picture) <> (Event.tupled, Event.unapply)

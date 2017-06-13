@@ -11,26 +11,35 @@ import play.mvc.Http
 
 import scala.concurrent.duration.Duration;
 
+/**
+  * Handles the two categories of errors: onClientError et onServerError
+  *
+  * @param userRepo
+  * @param eventRepo
+  * @param pictureRepo
+  * @param messageRepo
+  * @param secured
+  */
 @Singleton
 class ErrorHandler @Inject()(userRepo: UserRepo, eventRepo: EventRepo, pictureRepo: PictureRepo, messageRepo: MessageRepo, secured: Secured) extends HttpErrorHandler {
 
-  def onClientError(request: RequestHeader, statusCode: Int, message: String) = {
-    statusCode match {
-      case Http.Status.NOT_FOUND =>
-        Future.successful(
-          NotFound(views.html.notFound(secured.isLoggedIn(request), Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull))
-        )
-      case _ =>
-        Future.successful(
-          InternalServerError("A client error occurred: " + message)
-        )
-    }
-  }
+	def onClientError(request: RequestHeader, statusCode: Int, message: String) = {
+		statusCode match {
+			case Http.Status.NOT_FOUND =>
+				Future.successful(
+					NotFound(views.html.notFound(secured.isLoggedIn(request), Await.result(userRepo.findByName(secured.getUsername(request)), Duration(10, "seconds")).orNull))
+				)
+			case _ =>
+				Future.successful(
+					InternalServerError("A client error occurred: " + message)
+				)
+		}
+	}
 
-  def onServerError(request: RequestHeader, exception: Throwable) = {
-    exception.printStackTrace()
-    Future.successful(
-      InternalServerError("A server error occurred: " + exception.getMessage)
-    )
-  }
+	def onServerError(request: RequestHeader, exception: Throwable) = {
+		exception.printStackTrace()
+		Future.successful(
+			InternalServerError("A server error occurred: " + exception.getMessage)
+		)
+	}
 }

@@ -38,10 +38,10 @@ class Secured @Inject()(userRepo: UserRepo) {
       * @return True if user is logged in.
       */
     def isLoggedIn(request: Request[Any]): Boolean = {
-        getUsername(request) != null //Corriger en ajoutant vérif db
+        getUsername(request) != null
     }
 
     def isLoggedIn(request: RequestHeader): Boolean = {
-        getUsername(request) != null //Corriger en ajoutant vérif db
+        getUsername(request) != null
     }
 }
