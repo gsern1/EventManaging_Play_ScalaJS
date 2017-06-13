@@ -21,7 +21,7 @@ CREATE TABLE `events` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(45) NOT NULL,
   `date` DATETIME NOT NULL,
-  `description` varchar(45) DEFAULT NULL,
+  `description` varchar(10000) DEFAULT NULL,
   `creator` int(11) NOT NULL,
   `picture` int(11) NULL,
   `location` varchar(100) NOT NULL,
